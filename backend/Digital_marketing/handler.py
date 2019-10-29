@@ -30,8 +30,16 @@ class BaseHandler(RequestHandler):
         pass
 
     async def write_log(self, *args, filename):
-        async with open(join(self.application.settings['log_path'], filename), 'a') as f:
+        async with open(join(self.application.settings['log_path'],
+                             filename + '-' + strftime("%Y-%m-%d", localtime()) + '.log'), 'a') as f:
             await f.write(strftime("%Y-%m-%d %H:%M:%S", localtime()) + '\n' + str(args) + '\n' * 2)
+
+    def error_handle(self, form):
+        re_data = {}
+        self.set_status(404)
+        for field in form.errors:
+            re_data[field] = form.errors[field][0]
+        return re_data
 
 
 class RedisHandler(BaseHandler):

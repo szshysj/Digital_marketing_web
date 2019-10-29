@@ -251,11 +251,7 @@ class AddCampaignHandler(RedisHandler):
         form = AddCampaignForm.from_json(loads(param))
 
         if not form.validate():
-            re_data = {}
-            self.set_status(404)
-            for field in form.errors:
-                re_data[field] = form.errors[field][0]
-            return await self.finish(re_data)
+            return await self.finish(self.error_handle(form))
 
         api = BaseApi(self.current_user.access_token)
 
@@ -272,10 +268,10 @@ class AddCampaignHandler(RedisHandler):
             rp = await api.send_request(api_url='1/com.alibaba.p4p/alibaba.cnp4p.campaign.add', param=param)
         except HTTPClientError as e:
             await self.write_log(str(self.current_user.access_token),
-                                 str(param), str(e.response.body.decode('utf8')),
+                                 str(param),
                                  str(e.response.body.decode('utf8')),
                                  '创建推广计划失败',
-                                 filename='post_campaign.log')
+                                 filename='post_campaign')
             self.set_status(404)
             return await self.finish(e.response.body.decode('utf8'))
         else:

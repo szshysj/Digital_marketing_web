@@ -37,11 +37,14 @@ class CreateAdgroupForm(Form):
         DataRequired(message='请输入计划id'),
         Length(min=6, max=10)])
 
-    bidPrice = FloatField('推广单元默认出价', validators=[DataRequired(message='请输入推广单元默认出价')])
+    bidPrice = FloatField('推广单元默认出价', validators=[
+        DataRequired(message='请输入推广单元默认出价'),
+        NumberRange(min=0.3, message='推广单元默认出价不能低于0.3元')
+    ])
 
     offerId = StringField('商品id', validators=[
         DataRequired(message='请输入商品id'),
-        Length(min=8, max=14)])
+        Length(min=8, max=14, message='请输入正确的商品id长度')])
 
 
 class GetAdgroup(Form):

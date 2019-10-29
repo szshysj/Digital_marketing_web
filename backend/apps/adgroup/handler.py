@@ -101,11 +101,6 @@ class UpdateAdgroupStatusHandler(RedisHandler):
 
 class CreateAdgroupHandler(RedisHandler):
 
-    async def write_log(self, *args, filename):
-
-        async with open(join(self.application.settings['log_path'], filename), 'a') as f:
-            await f.write(strftime("%Y-%m-%d %H:%M:%S", localtime()) + '\n' + str(args) + '\n' * 2)
-
     @authenticated_async
     async def get(self, campaign_id, page_num, *args, **kwargs):
         re_data = {}
@@ -150,40 +145,32 @@ class CreateAdgroupHandler(RedisHandler):
 
     @authenticated_async
     async def post(self, *args, **kwargs):
-        re_data = {}
 
-        param = loads(self.request.body.decode('utf8'))
+        param = self.request.body.decode('utf8')
 
-        form = CreateAdgroupForm.from_json(param)
+        form = CreateAdgroupForm.from_json(loads(param))
 
-        if form.validate():
-            api = BaseApi(access_token=self.current_user.access_token)
+        if not form.validate():
+            return await self.finish(self.error_handle(form))
 
-            param = {
-                'campaignId': form.campaignId.data,
-                'onlineState': 1,
-                'bidPrice': form.bidPrice.data,
-                'offerId': form.offerId.data
-            }
-            try:
-                resp = await api.send_request(api_url='1/com.alibaba.p4p/alibaba.cnp4p.adgroup.add', param=param)
-            except HTTPClientError as e:
-                await self.write_log(str(self.current_user.access_token),
-                                     str(param), str(e),
-                                     str(e.response.body.decode('utf8')),
-                                     '创建推广单元失败',
-                                     filename='post_adgroup.log')
-                self.set_status(404)
-                re_data['code'] = 1007,
-                re_data['message'] = '创建推广单元失败'
-                return await self.finish(re_data)
+        api = BaseApi(access_token=self.current_user.access_token)
 
-            # todo 探测默认出价的底
+        param = {
+            'campaignId': form.campaignId.data,
+            'onlineState': 1,
+            'bidPrice': form.bidPrice.data,
+            'offerId': form.offerId.data
+        }
 
-            await self.finish(resp)
-
-        else:
+        try:
+            resp = await api.send_request(api_url='1/com.alibaba.p4p/alibaba.cnp4p.adgroup.add', param=param)
+        except HTTPClientError as e:
+            await self.write_log(str(self.current_user.access_token),
+                                 str(param),
+                                 str(e.response.body.decode('utf8')),
+                                 '创建推广单元失败',
+                                 filename='post_adgroup')
             self.set_status(404)
-            for field in form.errors:
-                re_data[field] = form.errors[field][0]
-            await self.finish(re_data)
+            return await self.finish(e.response.body.decode('utf8'))
+        else:
+            await self.finish(resp)
