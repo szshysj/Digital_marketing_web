@@ -7,7 +7,7 @@
 
 from Digital_marketing.models import BaseModel
 
-from peewee import IntegerField, FixedCharField, SmallIntegerField, DateTimeField
+from peewee import IntegerField, FixedCharField, SmallIntegerField, DateTimeField, BooleanField
 
 
 class User(BaseModel):
@@ -41,5 +41,13 @@ class User(BaseModel):
 
 class User_campaign(BaseModel):
     memberId = FixedCharField(max_length=22, null=False, index=True, verbose_name='会员接口id')
-    campaign_id = FixedCharField(max_length=60, null=False, verbose_name='推广计划id')
+    campaignId = FixedCharField(max_length=60, null=False, primary_key=True, verbose_name='推广计划id')
     title = FixedCharField(max_length=60, null=False, verbose_name='推广计划名称')
+    budget = SmallIntegerField(null=False, verbose_name='推广计划预算')
+    promoteArea = FixedCharField(null=False, max_length=255, verbose_name='投放地域')
+    schedule = SmallIntegerField(null=False, verbose_name='投放时段')
+    onlineStatus = BooleanField(null=False, verbose_name='推广计划状态')
+    settleStatus = BooleanField(null=False)
+    cositeFlag = BooleanField(null=False, verbose_name='站外推广')
+    createTime = DateTimeField(null=False, verbose_name='推广计划创建时间')
+    modifiedTime = DateTimeField(null=False, verbose_name='推广计划被修改时间')

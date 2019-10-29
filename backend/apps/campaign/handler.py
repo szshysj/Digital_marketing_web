@@ -173,52 +173,14 @@ class AddCampaignHandler(RedisHandler):
     def re_match(title):
         try:
             match('.*(-財源廣進-\\d{14})', title['title']).group(1)
-            return title
         except AttributeError:
             return False
 
-    @staticmethod
-    def get_schedule(type_num):
-        """
-        全天 7*24小时
-        热门时间段  上午10点到12点   下午3点到6点    晚上9点到11点
-        闲时 晚上9点到早上6点
-
-        :param type_num: 时段类型
-        :return: 具体的值
-        """
-
-        schedule_dict = {
-            # 7*24 全天
-            1: '111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'
-               '111111111111111111111111111111111111111111111111111111111111111111111',
-            # 7*24 热门
-            2: '000000000011000111000110000000000011000111000110000000000011000111000110000000000011000111000110000'
-               '000000011000111000110000000000011000111000110000000000011000111000110',
-            # 7*24 闲时
-            3: '111111000000000000000111111111000000000000000111111111000000000000000111111111000000000000000111111'
-               '111000000000000000111111111000000000000000111111111000000000000000111',
-            # 工作日 全天
-            4: '000000000000000000000000111111111111111111111111111111111111111111111111111111111111111111111111111'
-               '111111111111111111111111111111111111111111111000000000000000000000000',
-            # 工作日 热门
-            5: '000000000000000000000000000000000011000111000110000000000011000111000110000000000011000111000110000'
-               '000000011000111000110000000000011000111000110000000000000000000000000',
-            # 工作日 闲时
-            6: '000000000000000000000000111111000000000000000111111111000000000000000111111111000000000000000111111'
-               '111000000000000000111111111000000000000000111000000000000000000000000',
-            # 休息日 全天
-            7: '111111111111111111111111000000000000000000000000000000000000000000000000000000000000000000000000000'
-               '000000000000000000000000000000000000000000000111111111111111111111111',
-            # 休息日 热门
-            8: '000000000011000111000110000000000000000000000000000000000000000000000000000000000000000000000000000'
-               '000000000000000000000000000000000000000000000000000000011000111000110',
-            # 休息日 闲时
-            9: '111111000000000000000111000000000000000000000000000000000000000000000000000000000000000000000000000'
-               '000000000000000000000000000000000000000000000111111000000000000000111'
-        }
-
-        return schedule_dict[type_num]
+        try:
+            match('.*(未保护)', title['title']).group(1)
+            return False
+        except AttributeError:
+            return title
 
     @authenticated_async
     async def get(self, *args, **kwargs):
@@ -235,13 +197,11 @@ class AddCampaignHandler(RedisHandler):
                                  filename='get_campaign')
             return await self.finish(e.response.body.decode('utf8'))
 
-        # 找出属于本app的计划
-        # resp = loads(resp)
-        # result = list(filter(self.re_match, resp['campaigns']))
+        # 找出属于本app的计划, 过滤未保护的计划
+        resp = loads(resp)
+        result = list(filter(self.re_match, resp['campaigns']))
 
-        # re_data['result'] = result
-
-        await self.finish(resp)
+        await self.finish({'result': result})
 
     @authenticated_async
     async def post(self, *args, **kwargs):
@@ -281,12 +241,28 @@ class AddCampaignHandler(RedisHandler):
             try:
                 await self.application.objects.create(User_campaign,
                                                       memberId=self.current_user.memberId,
-                                                      campaign_id=result['campaign']['campaignId'],
-                                                      title=result['campaign']['title'])
+                                                      campaignId=result['campaign']['campaignId'],
+                                                      title=result['campaign']['title'],
+                                                      budget=result['campaign']['budget'],
+                                                      promoteArea=result['campaign']['promoteArea'],
+                                                      schedule=form.schedule.data,
+                                                      onlineStatus=result['campaign']['onlineStatus'],
+                                                      settleStatus=result['campaign']['settleStatus'],
+                                                      cositeFlag=result['campaign']['cositeFlag'],
+                                                      createTime=result['campaign']['createTime'],
+                                                      modifiedTime=result['campaign']['modifiedTime'])
             except Exception as e:
                 await self.write_log(str(self.current_user.memberId),
                                      str(result['campaign']['campaignId']),
                                      str(result['campaign']['title']),
+                                     str(result['campaign']['budget']),
+                                     str(result['campaign']['promoteArea']),
+                                     str(form.schedule.data),
+                                     str(result['campaign']['onlineStatus']),
+                                     str(result['campaign']['settleStatus']),
+                                     str(result['campaign']['cositeFlag']),
+                                     str(result['campaign']['createTime']),
+                                     str(result['campaign']['modifiedTime']),
                                      str(e),
                                      '创建推广计划sql记录失败',
                                      filename='post_campaign')
