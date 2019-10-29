@@ -7,13 +7,13 @@
 
 from tornado.web import url
 from apps.campaign.handler import AddCampaignHandler, UpdateCampaignHandler, DeleteCampaignHandler, \
-    UpdataCampaignStatusHandler
+    UpdataCampaignStatusHandler, GetCampaignHandler
 
 urlpatten = [
     # 创建广告推广计划
     url('/post/campaign/', AddCampaignHandler),
     # 获取所有广告推广计划
-    url('/get/campaign/', AddCampaignHandler),
+    url('/get/campaign/', GetCampaignHandler),
     # 暂停广告推广计划
     url('/update/campaign/status/', UpdataCampaignStatusHandler),
     # 修改广告推广计划
