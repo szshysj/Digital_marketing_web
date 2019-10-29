@@ -11,6 +11,7 @@ from apps.campaign.urls import urlpatten as campaign_urls
 from apps.offer.urls import urlpatten as offer_urls
 from apps.adgroup.urls import urlpatten as adgroup_urls
 from apps.keyword.urls import urlpatten as keyword_urls
+from apps.test_api.urls import urlpatten as test_urls
 
 urlspatten = []
 
@@ -20,3 +21,4 @@ urlspatten += campaign_urls
 urlspatten += offer_urls
 urlspatten += adgroup_urls
 urlspatten += keyword_urls
+urlspatten += test_urls

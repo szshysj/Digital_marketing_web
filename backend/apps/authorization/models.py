@@ -6,7 +6,6 @@
 # @Email   : d90159@163.com / 351469076@qq.com
 
 from Digital_marketing.models import BaseModel
-from datetime import datetime
 
 from peewee import IntegerField, FixedCharField, SmallIntegerField, DateTimeField
 
@@ -38,3 +37,9 @@ class User(BaseModel):
     tpYear = SmallIntegerField(null=False, verbose_name='淘宝年龄')
     trustScore = SmallIntegerField(null=False, verbose_name='诚信分数')
     update_time = DateTimeField(null=False, verbose_name='更新时间')
+
+
+class User_campaign(BaseModel):
+    memberId = FixedCharField(max_length=22, null=False, index=True, verbose_name='会员接口id')
+    campaign_id = FixedCharField(max_length=60, null=False, verbose_name='推广计划id')
+    title = FixedCharField(max_length=60, null=False, verbose_name='推广计划名称')

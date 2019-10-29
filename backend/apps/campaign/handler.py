@@ -7,6 +7,7 @@
 
 from Digital_marketing.handler import RedisHandler
 from apps.campaign.forms import AddCampaignForm, UpdateCampaignStatusForm, UpdateCampaignForm
+from apps.authorization.models import User_campaign
 from tools.decorator import authenticated_async
 from Request_Base_Api.BaseApi import BaseApi
 from time import localtime, strftime
@@ -221,7 +222,6 @@ class AddCampaignHandler(RedisHandler):
 
     @authenticated_async
     async def get(self, *args, **kwargs):
-        re_data = {}
 
         api = BaseApi(self.current_user.access_token)
 
@@ -229,11 +229,11 @@ class AddCampaignHandler(RedisHandler):
             resp = await api.send_request(api_url='1/com.alibaba.p4p/alibaba.cnp4p.campaign.list')
         except HTTPClientError as e:
             self.set_status(404)
-            await self.write_log(str(self.current_user.access_token), str(e),
-                                 str(e.response.body.decode('utf8')), '获取所有推广计划失败')
-            re_data['code'] = 1006,
-            re_data['message'] = '获取所有推广计划失败'
-            return await self.finish(re_data)
+            await self.write_log(str(self.current_user.access_token),
+                                 str(e.response.body.decode('utf8')),
+                                 '获取所有推广计划失败',
+                                 filename='get_campaign')
+            return await self.finish(e.response.body.decode('utf8'))
 
         # 找出属于本app的计划
         # resp = loads(resp)
@@ -275,4 +275,22 @@ class AddCampaignHandler(RedisHandler):
             self.set_status(404)
             return await self.finish(e.response.body.decode('utf8'))
         else:
-            await self.finish(rp)
+
+            result = loads(rp)  # 解析成功数据
+
+            try:
+                await self.application.objects.create(User_campaign,
+                                                      memberId=self.current_user.memberId,
+                                                      campaign_id=result['campaign']['campaignId'],
+                                                      title=result['campaign']['title'])
+            except Exception as e:
+                await self.write_log(str(self.current_user.memberId),
+                                     str(result['campaign']['campaignId']),
+                                     str(result['campaign']['title']),
+                                     str(e),
+                                     '创建推广计划sql记录失败',
+                                     filename='post_campaign')
+                self.set_status(404)
+                return await self.finish({'result': 'sql提交错误'})
+            else:
+                await self.finish(rp)

@@ -6,7 +6,7 @@
 # @Email   : d90159@163.com / 351469076@qq.com
 
 from Digital_marketing.settings import database, settings
-from apps.authorization.models import User
+from apps.authorization.models import User, User_campaign
 from pprint import pprint as pp
 
 from requests import get, post
@@ -15,7 +15,7 @@ from requests import get, post
 
 
 def init():
-    database.create_tables([User])
+    database.create_tables([User_campaign])
 
 
 def authorization(code):
