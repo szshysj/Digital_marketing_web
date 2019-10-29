@@ -6,8 +6,9 @@
 # @Email   : d90159@163.com / 351469076@qq.com
 
 from tornado.web import url
-from apps.test_api.handler import TestHandler
+from apps.test_api.handler import TestHandler, Test1Handler
 
 urlpatten = [
-    url('/test/', TestHandler)
+    url('/test/', TestHandler),
+    url('/test1/', Test1Handler)
 ]
