@@ -6,8 +6,8 @@
 # @Email   : d90159@163.com / 351469076@qq.com
 
 from tornado.web import url
-from apps.campaign.handler import AddCampaignHandler, UpdateCampaignHandler, DeleteCampaignHandler, \
-    UpdataCampaignStatusHandler, GetCampaignHandler
+from apps.campaign.handler import AddCampaignHandler, UpdateCampaignHandler, UpdataCampaignStatusHandler, \
+    GetCampaignHandler
 
 urlpatten = [
     # 创建广告推广计划
@@ -15,9 +15,9 @@ urlpatten = [
     # 获取所有广告推广计划
     url('/get/campaign/', GetCampaignHandler),
     # 暂停广告推广计划
-    url('/update/campaign/status/', UpdataCampaignStatusHandler),
+    # url('/update/campaign/status/', UpdataCampaignStatusHandler),
     # 修改广告推广计划
-    url('/update/campaign/', UpdateCampaignHandler)
+    # url('/update/campaign/', UpdateCampaignHandler)
     # 删除广告推广计划, 目前没有权限
     # url('/delete/campaign/', DeleteCampaignHandler)
 ]

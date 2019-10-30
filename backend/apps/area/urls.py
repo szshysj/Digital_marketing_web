@@ -10,5 +10,5 @@ from apps.area.handler import GetAreaHandler
 
 urlpatten = [
     # 获取所有可投放地域列表
-    url('/get/area/', GetAreaHandler)
+    # url('/get/area/', GetAreaHandler)
 ]

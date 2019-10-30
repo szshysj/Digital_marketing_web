@@ -10,5 +10,5 @@ from apps.offer.handler import GetOfferHandler
 
 urlpatten = [
     # 获取用户商品列表
-    url('/get/offer/', GetOfferHandler)
+    # url('/get/offer/', GetOfferHandler)
 ]

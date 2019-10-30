@@ -10,11 +10,11 @@ from apps.adgroup.handler import CreateAdgroupHandler, UpdateAdgroupStatusHandle
 
 urlpatten = [
     # 创建推广单元
-    url('/post/adgroup/', CreateAdgroupHandler),
+    # url('/post/adgroup/', CreateAdgroupHandler),
     # 根据推广计划id获得其所有推广单元
-    url('/get/adgroup/(\d+)/(\d+)/', CreateAdgroupHandler),
+    # url('/get/adgroup/(\d+)/(\d+)/', CreateAdgroupHandler),
     # 更新推广单元状态
-    url('/update/adgroup/status/', UpdateAdgroupStatusHandler),
+    # url('/update/adgroup/status/', UpdateAdgroupStatusHandler),
     # 删除推广单元
-    url('/delete/adgroup/', DeleteAdgroupHandler)
+    # url('/delete/adgroup/', DeleteAdgroupHandler)
 ]

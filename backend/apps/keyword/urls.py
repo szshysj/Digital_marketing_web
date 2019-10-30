@@ -10,9 +10,9 @@ from tornado.web import url
 
 urlpatten = [
     # 根据 推广单元id 获取其对应100条关键词
-    url('/get/keyword/(\d+)/', GetKeywordHandler),
+    # url('/get/keyword/(\d+)/', GetKeywordHandler),
     # 添加关键词
-    url('/post/keyword/', GetKeywordHandler),
+    # url('/post/keyword/', GetKeywordHandler),
     # 根据 推广单元id 获取关键词列表
-    url('/get/keywordlist/(\d+)/', GetKeywordListByAdgroupHandle)
+    # url('/get/keywordlist/(\d+)/', GetKeywordListByAdgroupHandle)
 ]
