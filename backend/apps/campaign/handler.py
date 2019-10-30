@@ -20,30 +20,6 @@ from tornado.httpclient import HTTPClientError
 from aiofiles import open
 
 
-class DeleteCampaignHandler(RedisHandler):
-
-    @authenticated_async
-    async def post(self, *args, **kwargs):
-        re_data = {}
-        param = loads(self.request.body.decode('utf8'))
-
-        if not isinstance(param['campaignIdList'], list):
-            re_data['message'] = '参数必须是列表'
-            return await self.finish(re_data)
-
-        api = BaseApi(access_token=self.current_user.access_token)
-
-        try:
-            resp = await api.send_request(api_url='1/com.alibaba.p4p/alibaba.cnp4p.campaign.delete', param=param)
-        except HTTPClientError as e:
-            print(e.code)
-            print(e.message)
-            print(e.args)
-            return await self.finish(e.response.body.decode('utf8'))
-
-        await self.finish(resp)
-
-
 class UpdataCampaignStatusHandler(RedisHandler):
 
     async def write_log(self, *args, filename):
@@ -131,16 +107,19 @@ class GetCampaignHandler(RedisHandler):
 
         # 获取库里的数据
         campaign = await self.application.objects.execute(
-            User_campaign.select().where(User_campaign.memberId == self.current_user.memberId)
-        )
+            User_campaign.select(
+                User_campaign.campaignId,
+                User_campaign.modifiedTime
+            ).where(
+                User_campaign.memberId == self.current_user.memberId))
 
-        # 库里没有数据, 因为肯定以库里数据为准
+        # 库里没有数据后面就没有意义了, 因为必须以 库里数据和线上 共有的数据为准
         if not campaign:
             return await self.finish({'result': []})
 
         api = BaseApi(self.current_user.access_token)
 
-        # 获取全部得推广计划
+        # 获取线上所有推广计划
         try:
             resp = await api.send_request(api_url='1/com.alibaba.p4p/alibaba.cnp4p.campaign.list')
         except HTTPClientError as e:
