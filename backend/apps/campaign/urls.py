@@ -18,6 +18,4 @@ urlpatten = [
     # url('/update/campaign/status/', UpdataCampaignStatusHandler),
     # 修改广告推广计划
     # url('/update/campaign/', UpdateCampaignHandler)
-    # 删除广告推广计划, 目前没有权限
-    # url('/delete/campaign/', DeleteCampaignHandler)
 ]
