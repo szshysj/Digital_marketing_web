@@ -130,12 +130,11 @@ class GetCampaignHandler(RedisHandler):
             self.set_status(404)
             return await self.finish(e.response.body.decode('utf8'))
         else:
-
             resp = loads(resp)
 
             # 线上没有任何推广计划, 说明库里的计划被用户手动删除了
             if not resp['campaigns']:
-                return await self.finish({'result': []})
+                return await self.finish({'result': [], 'msg': '线上没有任何推广计划'})
 
             # 库里数据格式化
             list_result = []
@@ -154,8 +153,13 @@ class GetCampaignHandler(RedisHandler):
                 list_temp.append(result['modifiedTime'])
                 list_result_one.append(tuple(list_temp))
 
-            # 找出共有的数据, 此含义是, 找出没有被用户污染过的数据, 确保是我们的数据
+            # 找出共有的数据, 找出没有被用户污染过的数据(用户手动修改, 使用其他工具修改本工具计划等), 确保是我们的数据
             result = set(list_result) & set(list_result_one)
+
+            if not result:
+                # 数据被污染过, 过滤掉
+                return await self.finish({'result': [], 'msg': '没有符合我们的数据'})
+
             list_tmp = []
             for tmp in result:
                 for tmp_2 in resp['campaigns']:
