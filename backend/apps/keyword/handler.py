@@ -5,7 +5,7 @@
 # @Author  : 孔祥旭
 # @Email   : d90159@163.com / 351469076@qq.com
 
-from Digital_marketing.handler import RedisHandler
+from Digital_marketing.handler import BaseHandler
 from apps.keyword.forms import GetAdgroupKeywordHandler
 from Request_Base_Api.BaseApi import BaseApi
 from tools.decorator import authenticated_async
@@ -17,7 +17,7 @@ from tornado.httpclient import HTTPClientError
 from aiofiles import open
 
 
-class GetKeywordListByAdgroupHandle(RedisHandler):
+class GetKeywordListByAdgroupHandle(BaseHandler):
 
     async def write_log(self, *args, filename):
 
@@ -53,7 +53,7 @@ class GetKeywordListByAdgroupHandle(RedisHandler):
             await self.finish(resp)
 
 
-class GetKeywordHandler(RedisHandler):
+class GetKeywordHandler(BaseHandler):
 
     async def write_log(self, *args, filename):
 

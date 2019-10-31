@@ -41,7 +41,7 @@ class User(BaseModel):
 
 class User_campaign(BaseModel):
     memberId = FixedCharField(max_length=22, null=False, index=True, verbose_name='会员接口id')
-    campaignId = FixedCharField(max_length=60, null=False, primary_key=True, verbose_name='推广计划id')
+    campaignId = IntegerField(null=False, primary_key=True, verbose_name='推广计划id')
     title = FixedCharField(max_length=60, null=False, verbose_name='推广计划名称')
     budget = SmallIntegerField(null=False, verbose_name='推广计划预算')
     promoteArea = FixedCharField(null=False, max_length=255, verbose_name='投放地域')

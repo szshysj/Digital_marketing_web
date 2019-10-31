@@ -5,7 +5,7 @@
 # @Author  : 孔祥旭
 # @Email   : d90159@163.com / 351469076@qq.com
 
-from Digital_marketing.handler import RedisHandler
+from Digital_marketing.handler import BaseHandler
 from apps.authorization.models import User
 from Request_Base_Api.BaseApi import BaseApi
 from datetime import datetime
@@ -18,7 +18,7 @@ from tornado.httpclient import AsyncHTTPClient, HTTPClientError
 from aiofiles import open
 
 
-class GetCodeHandler(RedisHandler):
+class GetCodeHandler(BaseHandler):
 
     async def write_log(self, *args):
 

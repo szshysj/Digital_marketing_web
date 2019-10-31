@@ -48,9 +48,12 @@ class CreateAdgroupForm(Form):
 
 
 class GetAdgroup(Form):
-    campaignId = IntegerField('推广计划id', validators=[DataRequired(message='请输入推广计划id')])
+    campaignId = IntegerField('推广计划id', validators=[
+        DataRequired(message='请输入推广计划id'),
+        NumberRange(min=100000000, max=999999999, message='请输入正确的推广计划ID')
+    ])
 
     pageNo = IntegerField('分页', validators=[
         DataRequired(message='请输入正确的页码'),
-        NumberRange(min=1, message='页面至少是1')
+        NumberRange(min=1, message='页面至少从第一页开始')
     ])

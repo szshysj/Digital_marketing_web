@@ -5,7 +5,7 @@
 # @Author  : 孔祥旭
 # @Email   : d90159@163.com / 351469076@qq.com
 
-from Digital_marketing.handler import RedisHandler
+from Digital_marketing.handler import BaseHandler
 from apps.adgroup.forms import CreateAdgroupForm, GetAdgroup, UpdateAdgroupStatusForm, DeleteAdgroupHandlerForm
 from tools.decorator import authenticated_async
 from os.path import join
@@ -17,7 +17,7 @@ from aiofiles import open
 from tornado.httpclient import HTTPClientError
 
 
-class DeleteAdgroupHandler(RedisHandler):
+class DeleteAdgroupHandler(BaseHandler):
 
     async def write_log(self, *args, filename):
 
@@ -56,7 +56,7 @@ class DeleteAdgroupHandler(RedisHandler):
             await self.finish(resp)
 
 
-class UpdateAdgroupStatusHandler(RedisHandler):
+class UpdateAdgroupStatusHandler(BaseHandler):
 
     async def write_log(self, *args, filename):
 
@@ -99,49 +99,41 @@ class UpdateAdgroupStatusHandler(RedisHandler):
             await self.finish(re_data)
 
 
-class CreateAdgroupHandler(RedisHandler):
+class GetAdgroupHandler(BaseHandler):
 
     @authenticated_async
     async def get(self, campaign_id, page_num, *args, **kwargs):
-        re_data = {}
 
-        dict_temp = {
-            'campaignId': campaign_id,
-            'pageNo': page_num
+        form = GetAdgroup.from_json({'campaignId': campaign_id, 'pageNo': page_num})
+
+        if not form.validate():
+            return await self.finish(self.error_handle(form))
+
+        api = BaseApi(access_token=self.current_user.access_token)
+
+        param = {
+            'campaignId': form.campaignId.data,
+            'pageNo': form.pageNo.data,
+            'pageSize': 200,
         }
-        form = GetAdgroup.from_json(dict_temp)
 
-        if form.validate():
-            api = BaseApi(access_token=self.current_user.access_token)
-            param = {
-                'campaignId': form.campaignId.data,
-                'pageNo': form.pageNo.data,
-                'pageSize': 200,
-            }
-            try:
-                resp = await api.send_request(api_url='1/com.alibaba.p4p/alibaba.cnp4p.adgroup.bycampaignids.list',
-                                              param=param)
-            except HTTPClientError as e:
-                await self.write_log(str(self.current_user.access_token),
-                                     str(param),
-                                     str(e),
-                                     str(e.response.body.decode('utf8')),
-                                     '获取推广计划下面的推广单元失败',
-                                     filename='get_adgroup.log')
-                self.set_status(404)
-                re_data['code'] = 1008,
-                re_data['message'] = '获取推广计划下面的推广单元失败'
-                return await self.finish(re_data)
-            else:
-                return await self.finish(resp)
+        try:
+            resp = await api.send_request(api_url='1/com.alibaba.p4p/alibaba.cnp4p.adgroup.bycampaignids.list',
+                                          param=param)
+        except HTTPClientError as e:
+            await self.write_log(str(self.current_user.access_token),
+                                 str(param),
+                                 str(e.response.body.decode('utf8')),
+                                 '获取推广计划下所有单元失败',
+                                 filename='get_adgroup')
+            self.set_status(404)
+            return await self.finish(e.response.body.decode('utf8'))
 
         else:
-            self.set_status(404)
-            for field in form.errors:
-                re_data[field] = form.errors[field][0]
-            await self.finish(re_data)
+            return await self.finish(resp)
 
-        await self.finish({'result': campaign_id})
+
+class CreateAdgroupHandler(BaseHandler):
 
     @authenticated_async
     async def post(self, *args, **kwargs):

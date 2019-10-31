@@ -5,7 +5,7 @@
 # @Author  : 孔祥旭
 # @Email   : d90159@163.com / 351469076@qq.com
 
-from Digital_marketing.handler import RedisHandler
+from Digital_marketing.handler import BaseHandler
 from tools.decorator import authenticated_async
 from Request_Base_Api.BaseApi import BaseApi
 from os.path import join
@@ -15,7 +15,7 @@ from tornado.httpclient import HTTPClientError
 from aiofiles import open
 
 
-class GetAreaHandler(RedisHandler):
+class GetAreaHandler(BaseHandler):
 
     async def wtire_log(self, *args):
 

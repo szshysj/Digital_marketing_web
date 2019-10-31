@@ -5,7 +5,7 @@
 # @Author  : 孔祥旭
 # @Email   : d90159@163.com / 351469076@qq.com
 
-from Digital_marketing.handler import RedisHandler
+from Digital_marketing.handler import BaseHandler
 from apps.campaign.forms import AddCampaignForm, UpdateCampaignStatusForm, UpdateCampaignForm
 from apps.authorization.models import User_campaign
 from tools.decorator import authenticated_async
@@ -20,7 +20,7 @@ from tornado.httpclient import HTTPClientError
 from aiofiles import open
 
 
-class UpdataCampaignStatusHandler(RedisHandler):
+class UpdataCampaignStatusHandler(BaseHandler):
 
     async def write_log(self, *args, filename):
 
@@ -60,7 +60,7 @@ class UpdataCampaignStatusHandler(RedisHandler):
             await self.finish(re_data)
 
 
-class UpdateCampaignHandler(RedisHandler):
+class UpdateCampaignHandler(BaseHandler):
 
     @authenticated_async
     async def post(self, *args, **kwargs):
@@ -100,7 +100,7 @@ class UpdateCampaignHandler(RedisHandler):
             await self.finish(re_data)
 
 
-class GetCampaignHandler(RedisHandler):
+class GetCampaignHandler(BaseHandler):
 
     @authenticated_async
     async def get(self, *args, **kwargs):
@@ -170,7 +170,7 @@ class GetCampaignHandler(RedisHandler):
             await self.finish({'result': list_tmp})
 
 
-class AddCampaignHandler(RedisHandler):
+class AddCampaignHandler(BaseHandler):
 
     @authenticated_async
     async def post(self, *args, **kwargs):

@@ -5,30 +5,22 @@
 # @Author  : 孔祥旭
 # @Email   : d90159@163.com / 351469076@qq.com
 
-from Digital_marketing.handler import RedisHandler
+from Digital_marketing.handler import BaseHandler
 from apps.test_api.forms import Test1Form
 
 
-class TestHandler(RedisHandler):
+class TestHandler(BaseHandler):
 
     async def get(self):
         await self.finish({'result': '成功'})
 
 
-class Test1Handler(RedisHandler):
+class Test1Handler(BaseHandler):
     async def get(self, *args, **kwargs):
+        await self.application.redis.set('kxx', '18645959590')
+        bin_value = await self.application.redis.get('kxx')
 
-        param = {
-            'filed1': '1'
-        }
+        print(bin_value)
+        print(bin_value.encode('utf8'))
 
-        form = Test1Form.from_json(param)
-
-        if not form.validate():
-            re_data = {}
-            self.set_status(404)
-            for field in form.errors:
-                re_data[field] = form.errors[field][0]
-            return await self.finish(re_data)
-
-        await self.finish({'result': '陈宫'})
+        await self.finish({'result': bin_value})

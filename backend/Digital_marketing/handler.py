@@ -83,9 +83,3 @@ class BaseHandler(RequestHandler):
         }
 
         return schedule_dict[type_num]
-
-
-class RedisHandler(BaseHandler):
-    def __init__(self, application, request, **kwargs):
-        super().__init__(application, request, **kwargs)
-        self.redis_conn = StrictRedis(**self.settings['redis'])
