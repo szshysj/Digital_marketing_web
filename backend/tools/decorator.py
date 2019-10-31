@@ -18,7 +18,7 @@ def authenticated_async(method):
         jsession = self.request.headers.get('JSESSION', None)
         if jsession:
             try:
-                # 对jwt进行解密, 有效期1o小时
+                # 对jwt进行解密, 有效期8小时
                 send_data = decode(jsession, self.settings['secret_key'], leeway=self.settings['jwt_expire'],
                                    options={'verify_exp': True})
                 user_id = send_data['id']
