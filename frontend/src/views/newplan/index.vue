@@ -60,6 +60,37 @@ import { getdata } from "@/api/newplan";
 import afteri from "@/assets/imgs/after-i.png";
 export default {
   data() {
+    let validatename = (rule, value, callback) => {
+      if (value === "" || value === undefined) {
+        callback(new Error("请输入计划名称"));
+      } else if (maxstr(value) > 40) {
+        callback(new Error("标题长度在1-40之间"));
+      } else {
+        callback();
+      }
+
+      //处理汉字和字母长度
+      function maxstr(str) {
+        let realLength = 0,
+          len = str.length,
+          charCode = -1;
+        for (let i = 0; i < len; i++) {
+          charCode = str.charCodeAt(i);
+          if (charCode >= 0 && charCode <= 128) realLength += 1;
+          else realLength += 2;
+        }
+        return realLength;
+      }
+    };
+    let validatequota = (rule, value, callback) => {
+      if (value === "" || value === undefined) {
+        callback(new Error("请输入计划名称"));
+      } else if (value.length > 6) {
+        callback(new Error("标题长度在66-999999之间"));
+      } else {
+        callback();
+      }
+    };
     return {
       Timelot: false,
       region: false,
@@ -70,13 +101,12 @@ export default {
         directional: true
       },
       rules: {
-        name: [
-          { required: true, message: "请输入计划名称", trigger: "blur" },
-          { min: 1, max: 40, message: "长度在 1 到 40 个字符", trigger: "blur" }
-        ],
+        name: [{ required: true, validator: validatename, trigger: "blur" }],
         quota: [
+          { required: true, validator: validatequota, trigger: "blur" },
           { required: true, message: "不能为空" },
           { type: "number", message: "必须为数字值" }
+          // { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
         ]
       }
     };
