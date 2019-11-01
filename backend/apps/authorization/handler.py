@@ -9,21 +9,13 @@ from Digital_marketing.handler import BaseHandler
 from apps.authorization.models import User
 from Request_Base_Api.BaseApi import BaseApi
 from datetime import datetime
-from time import strftime, localtime
-from os.path import join
 
 from jwt import encode as jwt_encode
-from ujson import dumps, loads
+from ujson import loads
 from tornado.httpclient import AsyncHTTPClient, HTTPClientError
-from aiofiles import open
 
 
 class GetCodeHandler(BaseHandler):
-
-    async def write_log(self, *args):
-
-        async with open(join(self.application.settings['log_path'], 'authorization.log'), 'a') as f:
-            await f.write(strftime("%Y-%m-%d %H:%M:%S", localtime()) + '\n' + str(args) + '\n' * 2)
 
     async def get_token(self, code):
 
@@ -116,19 +108,23 @@ class GetCodeHandler(BaseHandler):
 
     async def get(self):
 
-        re_data = {}
-
         code = self.get_argument('code', None)
+
+        if not code:
+            self.set_status(404)
+            return await self.finish({'error_message': 'code为空'})
 
         # 调用 get_token接口
         try:
             rp = await self.get_token(code)
         except HTTPClientError as e:
-            await self.write_log(str(code), str(e), str(e.response.body.decode('utf8')), '调用get_token接口失败')
+            await self.write_log(
+                str(code),
+                str(e.response.body.decode('utf8')),
+                '调用get_token接口失败',
+                filename='authorization')
             self.set_status(404)
-            re_data['code'] = 1000,
-            re_data['message'] = '调用get_token接口失败'
-            return await self.finish(re_data)
+            return await self.finish({'error_message': '调用get_token接口失败'})
 
         # 自定义请求类
         api = BaseApi(access_token=rp['access_token'])
@@ -137,23 +133,26 @@ class GetCodeHandler(BaseHandler):
         try:
             rp_twice = await self.get_account_message(api)
         except HTTPClientError as e:
-            await self.write_log(str(rp), str(e), str(e.response.body.decode('utf8')), '获取账户信息失败')
+            await self.write_log(
+                str(rp),
+                str(e.response.body.decode('utf8')),
+                '获取账户信息失败',
+                filename='authorization')
             self.set_status(404)
-            re_data['code'] = 1001,
-            re_data['message'] = '获取账户信息失败'
-            return await self.finish(re_data)
+            return await self.finish({'error_message': '获取账户信息失败'})
 
         # 账号信息入库
         try:
             await self.write_db(rp, rp_twice)
         except Exception as e:
-            await self.write_log(str(rp), str(rp_twice), str(e), '同步账号信息失败')
+            await self.write_log(
+                str(rp),
+                str(rp_twice),
+                str(e),
+                '同步账号信息失败',
+                filename='authorization')
             self.set_status(404)
-            re_data['code'] = 1002,
-            re_data['message'] = '同步账号信息失败'
-            return await self.finish(re_data)
+            return await self.finish({'error_message': '同步账号信息失败'})
 
         # 生成Json Web Token
-        re_data['JSESSION'] = self.get_jwt(rp)
-
-        await self.finish(dumps(re_data))
+        await self.finish({'JSESSION': self.get_jwt(rp)})
