@@ -41,7 +41,7 @@ class GetOfferHandler(BaseHandler):
 
             # 如果是空, 继续执行没有意义了
             if not rp['result']['pageResult']['resultList']:
-                return await self.finish({'result': []})
+                return await self.finish({'result': [], 'msg': '用户供应商品列表为空'})
 
             # 获取数据的所有商品id
             list_1 = []  # 商品id列表
@@ -99,13 +99,13 @@ class GetOfferHandler(BaseHandler):
 
         # 只有一种情况, 当前推广计划下推广单元列表是空的, 直接返回全部商品
         if not list_2:
-            return await self.finish(rp)
+            return await self.finish({'result': rp, 'repeat_offer': []})
 
         result = list(set(list_1) & set(list_2))
 
         # 请求的当前商品列表 里 没有在投的推广单元
         if not result:
-            return await self.finish(rp)
+            return await self.finish({'result': rp, 'repeat_offer': []})
 
         # 当前商品列表里, 有在投的推广单元
         await self.finish({'result': rp, 'repeat_offer': result})

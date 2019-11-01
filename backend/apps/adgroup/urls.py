@@ -11,7 +11,7 @@ from apps.adgroup.handler import CreateAdgroupHandler, UpdateAdgroupStatusHandle
 
 urlpatten = [
     # 创建推广单元
-    # url('/post/adgroup/', CreateAdgroupHandler),
+    url('/post/adgroup/', CreateAdgroupHandler),
     # 根据推广计划id获得其所有推广单元
     url('/get/adgroup/(\d+)/(\d+)/', GetAdgroupHandler),
     # 更新推广单元状态
