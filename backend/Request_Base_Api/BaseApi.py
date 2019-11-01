@@ -38,7 +38,9 @@ class BaseApi:
         # 是否需要带上时间戳
         if timestamp:
             param['_aop_timestamp'] = str(int(time()) * 1000)
-        try:  # 删除上次携带的参数
+
+        # 删除上次携带的参数
+        try:
             param.pop('_aop_signature')
         except KeyError:
             pass
