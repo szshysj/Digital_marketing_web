@@ -51,3 +51,16 @@ class User_campaign(BaseModel):
     cositeFlag = BooleanField(null=False, verbose_name='站外推广')
     createTime = DateTimeField(null=False, verbose_name='推广计划创建时间')
     modifiedTime = DateTimeField(null=False, verbose_name='推广计划被修改时间')
+
+
+class User_adgroup(BaseModel):
+    memberId = FixedCharField(max_length=22, null=False, index=True, verbose_name='会员接口id')
+    campaignId = IntegerField(null=False, index=True, verbose_name='推广计划id')
+    adGroupId = IntegerField(null=False, index=True, verbose_name='推广单元id')
+    auditState = BooleanField(null=False, verbose_name='未知')
+    bidPrice = SmallIntegerField(null=False, verbose_name='推广单元默认出价')
+    createTime = DateTimeField(null=False, verbose_name='推广单元创建时间')
+    modifiedTime = DateTimeField(null=False, verbose_name='推广单元修改时间')
+    offerId = IntegerField(null=False, verbose_name='供应商品id')
+    onlineState = BooleanField(null=False, verbose_name='推广单元状态')
+    title = FixedCharField(max_length=60, null=False, verbose_name='商品单元名称')

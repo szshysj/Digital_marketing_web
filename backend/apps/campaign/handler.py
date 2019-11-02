@@ -12,7 +12,6 @@ from tools.decorator import authenticated_async
 from Request_Base_Api.BaseApi import BaseApi
 from time import localtime, strftime
 from os.path import join
-from re import match
 from playhouse.shortcuts import model_to_dict
 
 from ujson import loads
@@ -236,6 +235,6 @@ class AddCampaignHandler(BaseHandler):
                                      '创建推广计划sql记录失败',
                                      filename='post_campaign')
                 self.set_status(404)
-                return await self.finish({'result': 'sql提交错误'})
+                return await self.finish({'error_message': 'sql语句提交错误'})
             else:
                 await self.finish(rp)

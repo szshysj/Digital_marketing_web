@@ -55,11 +55,6 @@ class GetKeywordListByAdgroupHandle(BaseHandler):
 
 class GetKeywordHandler(BaseHandler):
 
-    async def write_log(self, *args, filename):
-
-        async with open(join(self.application.settings['log_path'], filename), 'a') as f:
-            await f.write(strftime("%Y-%m-%d %H:%M:%S", localtime()) + '\n' + str(args) + '\n' * 2)
-
     @authenticated_async
     async def get(self, adgroup_id, *args, **kwargs):
         re_data = {}
@@ -87,7 +82,7 @@ class GetKeywordHandler(BaseHandler):
             except HTTPClientError as e:
                 await self.write_log(str(self.current_user.access_token), str(param), str(e),
                                      str(e.response.body.decode('utf8')), '获取指定推广单元关键词失败',
-                                     filename='get_keyword.log')
+                                     filename='get_keyword')
                 self.set_status(404)
                 re_data['code'] = 1009,
                 re_data['message'] = '获取指定推广单元关键词失败'
@@ -124,7 +119,7 @@ class GetKeywordHandler(BaseHandler):
         except HTTPClientError as e:
             await self.write_log(str(self.current_user.access_token), str(param), str(e),
                                  str(e.response.body.decode('utf8')), '添加网销宝关键词失败',
-                                 filename='post_keyword.log')
+                                 filename='post_keyword')
             self.set_status(404)
             re_data['code'] = 1010,
             re_data['message'] = '添加网销宝关键词失败'
