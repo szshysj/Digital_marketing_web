@@ -19,8 +19,13 @@ from wtforms_json import init
 def make_app(loop):
     apps = Application(urlspatten, **settings, debug=True)
 
+    func = RedisPool(loop=loop)
+
     # redis异步库
-    apps.redis = RedisPool(loop=loop).get_conn()
+    apps.redis = func.get_conn()
+
+    # 异步请求库
+    apps.session = func.get_aiohttp()
 
     # mysql异步ORM库
     objects = Manager(database)
