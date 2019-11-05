@@ -7,6 +7,7 @@
 
 import aioredis
 import aiohttp
+from ujson import dumps
 
 
 async def _init_with_loop(loop):
@@ -20,7 +21,7 @@ async def _init_with_loop(loop):
     __pool = await aioredis.create_redis_pool(
         'redis://localhost', minsize=5, maxsize=10, encoding='utf8', loop=loop)
 
-    __session = aiohttp.ClientSession()
+    __session = aiohttp.ClientSession(json_serialize=dumps)
 
     return __pool, __session
 

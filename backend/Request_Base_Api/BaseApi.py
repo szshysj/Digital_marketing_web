@@ -9,9 +9,7 @@ from hashlib import sha1
 from time import time
 from Digital_marketing.settings import settings
 from hmac import new
-
-from tornado.httpclient import AsyncHTTPClient
-from tornado.escape import url_escape
+from ujson import loads
 
 
 class BaseApi:
@@ -25,12 +23,10 @@ class BaseApi:
         self._request_url = 'http://gw.open.1688.com/openapi/'
         # 用户授权令牌
         self._access_token = access_token
+        # 接口url
+        self._api_url = ''
 
-    @staticmethod
-    def urlencode(param):
-        return url_escape(str(param), plus=False)
-
-    def _get_sign(self, api_url, param, timestamp):
+    def _get_sign(self, param, timestamp):
 
         # 带上access_token
         param['access_token'] = self._access_token
@@ -51,7 +47,7 @@ class BaseApi:
         param_list.sort()
 
         # 构造请求url, 此值需要return
-        request_url = 'param2/' + api_url + '/' + settings['app_key']
+        request_url = 'param2/' + self._api_url + '/' + settings['app_key']
 
         # 构造签名因子
         sign_str = request_url + ''.join(param_list)
@@ -63,26 +59,31 @@ class BaseApi:
         # 返回url和参数字典
         return self._request_url + request_url, param
 
-    async def send_request(self, api_url, param=None, timestamp=True, method='GET'):
+    async def send_request(self, session, param=None, timestamp=True, method='GET'):
 
         # 判断是否传进参数
         if not param:
             param = {}
 
         # 进行签名, 获得请求body体
-        url, body = self._get_sign(api_url, param, timestamp)
+        url, body = self._get_sign(param, timestamp)
 
         # 拼接url参数部分
         param_str = ''
         for k, y in body.items():
-            param_str += f'{k}={self.urlencode(y)}&'
+            # param_str += f'{k}={self.urlencode(y)}&'
+            param_str += f'{k}={y}&'
 
         # 生成url
         url += '?' + param_str[:-1]
 
         if method == 'GET':
-            resp = await AsyncHTTPClient().fetch(url)
+            async with session.get(url, timeout=5) as resp:
+                status_code = resp.status
+                text = await resp.text()
         else:
-            resp = await AsyncHTTPClient().fetch(url, method='POST')
+            async with session.post(url, timeout=5) as resp:
+                status_code = resp.status
+                text = await resp.text()
 
-        return resp.body.decode('utf8')
+        return status_code, loads(text)

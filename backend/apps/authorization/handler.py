@@ -6,43 +6,20 @@
 # @Email   : d90159@163.com / 351469076@qq.com
 
 from Digital_marketing.handler import BaseHandler
+from Request_Base_Api.get_token import get_token
+from Request_Base_Api.get_account_info import GetAccountInfo
 from apps.authorization.models import User
-from Request_Base_Api.BaseApi import BaseApi
 from datetime import datetime
 
 from jwt import encode as jwt_encode
-from ujson import loads
-from tornado.httpclient import AsyncHTTPClient, HTTPClientError
 
 
 class GetCodeHandler(BaseHandler):
 
-    async def get_token(self, code):
-
-        url = f'https://gw.open.1688.com/openapi/http/1/system.oauth2/getToken/{self.application.settings["app_key"]}'
-
-        body = 'grant_type=authorization_code' + '&'
-        body += 'need_refresh_token=true' + '&'
-        body += f'client_id={self.application.settings["app_key"]}' + '&'
-        body += f'client_secret={self.application.settings["app_secret"]}' + '&'
-        body += f'redirect_uri={self.application.settings["app_callback_url"]}/get_code/' + '&'
-        body += f'code={code}'
-
-        rp = await AsyncHTTPClient().fetch(url, method='POST', body=body)
-
-        return loads(rp.body.decode('utf8'))
-
-    @staticmethod
-    async def get_account_message(api):
-
-        rp_twice = await api.send_request(api_url='1/com.alibaba.account/alibaba.account.basic', timestamp=False)
-
-        return loads(rp_twice)
-
-    def get_jwt(self, rp):
+    def get_jwt(self, text_):
 
         payload = {
-            'id': rp['memberId'],
+            'id': text_['memberId'],
             'exp': datetime.utcnow()  # 必须要用utc
         }
 
@@ -114,45 +91,28 @@ class GetCodeHandler(BaseHandler):
             self.set_status(404)
             return await self.finish({'error_message': 'code为空'})
 
-        # 调用 get_token接口
-        try:
-            rp = await self.get_token(code)
-        except HTTPClientError as e:
-            await self.write_log(
-                str(code),
-                str(e.response.body.decode('utf8')),
-                '调用get_token接口失败',
-                filename='authorization')
-            self.set_status(404)
+        # 进行授权认证
+        status_code, text = await get_token(code, self.application.session, self.application.settings)
+        if status_code != 200:
+            await self.write_log(str(text), '调用get_token接口失败', filename='authorization')
+            self.set_status(401)
             return await self.finish({'error_message': '调用get_token接口失败'})
 
-        # 自定义请求类
-        api = BaseApi(access_token=rp['access_token'])
-
-        # 调用 获取授权账户信息接口
-        try:
-            rp_twice = await self.get_account_message(api)
-        except HTTPClientError as e:
-            await self.write_log(
-                str(rp),
-                str(e.response.body.decode('utf8')),
-                '获取账户信息失败',
-                filename='authorization')
+        # 调用 获取授权账户信息api
+        api = GetAccountInfo(access_token=text['access_token'])
+        status_code, text_2 = await api.send_request(self.application.session, timestamp=False)
+        if status_code != 200:
+            await self.write_log(str(text), '获取账户信息失败', filename='authorization')
             self.set_status(404)
             return await self.finish({'error_message': '获取账户信息失败'})
 
-        # 账号信息入库
+        # 获得账号信息, 把信息写入到数据库
         try:
-            await self.write_db(rp, rp_twice)
+            await self.write_db(text, text_2)
         except Exception as e:
-            await self.write_log(
-                str(rp),
-                str(rp_twice),
-                str(e),
-                '同步账号信息失败',
-                filename='authorization')
+            await self.write_log(str(text), str(text_2), str(e), '同步账号信息失败', filename='authorization')
             self.set_status(404)
             return await self.finish({'error_message': '同步账号信息失败'})
 
         # 生成Json Web Token
-        await self.finish({'JSESSION': self.get_jwt(rp)})
+        await self.finish({'JSESSION': self.get_jwt(text)})

@@ -7,7 +7,7 @@
 
 from Digital_marketing.models import BaseModel
 
-from peewee import IntegerField, FixedCharField, SmallIntegerField, DateTimeField, BooleanField
+from peewee import IntegerField, FixedCharField, SmallIntegerField, DateTimeField, BooleanField, CharField
 
 
 class User(BaseModel):
@@ -39,8 +39,12 @@ class User(BaseModel):
     update_time = DateTimeField(null=False, verbose_name='更新时间')
 
 
-class User_campaign(BaseModel):
+# 阿里唯一ID
+class Member(BaseModel):
     memberId = FixedCharField(max_length=22, null=False, index=True, verbose_name='会员接口id')
+
+
+class User_campaign(Member):
     campaignId = IntegerField(null=False, primary_key=True, verbose_name='推广计划id')
     title = FixedCharField(max_length=60, null=False, verbose_name='推广计划名称')
     budget = SmallIntegerField(null=False, verbose_name='推广计划预算')
@@ -53,8 +57,7 @@ class User_campaign(BaseModel):
     modifiedTime = DateTimeField(null=False, verbose_name='推广计划被修改时间')
 
 
-class User_adgroup(BaseModel):
-    memberId = FixedCharField(max_length=22, null=False, index=True, verbose_name='会员接口id')
+class User_adgroup(Member):
     campaignId = IntegerField(null=False, index=True, verbose_name='推广计划id')
     adGroupId = IntegerField(null=False, index=True, verbose_name='推广单元id')
     auditState = BooleanField(null=False, verbose_name='未知')
@@ -64,3 +67,9 @@ class User_adgroup(BaseModel):
     offerId = IntegerField(null=False, verbose_name='供应商品id')
     onlineState = BooleanField(null=False, verbose_name='推广单元状态')
     title = FixedCharField(max_length=60, null=False, verbose_name='商品单元名称')
+
+
+class User_exception(Member):
+    param = CharField(max_length=500, default='', null=True, verbose_name='错误参数')
+    reason = CharField(max_length=500, null=False, verbose_name='错误原因')
+    cn_reason = FixedCharField(max_length=20, null=False, verbose_name='中文错误出处')
