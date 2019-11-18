@@ -1,34 +1,30 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
-import store from '@/store'
-import { getToken } from '@/utils/auth'
+// import { MessageBox, Message } from 'element-ui'
+// import store from '@/store'
+// import { getToken } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
-    baseURL: 'http://120.77.183.17:8888', //'http://120.77.183.17:8888',//process.env.VUE_APP_BASE_API, //'http://127.0.0.1:3000',// url = base url + request url
-    // withCredentials: true, // send cookies when cross-domain requests
-    timeout: 5000,// request timeout
-    // headers: { 'JSESSION': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI1MDk3NDl9.QT7BqvYLZ0TdglE3InJPdRm-qyeCTBQ11pNRq5MdTco" }
-
+  baseURL: 'http://120.77.183.17', // 'http://120.77.183.17:8888',//process.env.VUE_APP_BASE_API, //'http://127.0.0.1:3000',// url = base url + request url
+  // withCredentials: true, // send cookies when cross-domain requests
+  timeout: 5000 // request timeout
+  // headers: { 'JSESSION': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI1MDk3NDl9.QT7BqvYLZ0TdglE3InJPdRm-qyeCTBQ11pNRq5MdTco" }
 })
 
 // 添加请求拦截器
 
-service.interceptors.request.use(function (config) {
-    // 在发送请求之前做些什么
-    console.log(123, config.headers)
+service.interceptors.request.use(function(config) {
+  // 在发送请求之前做些什么
+  // console.log(123, config.headers)
 
-    //config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    //console.log(config.headers['ddd'] = '666')
-    config.headers.common['JSESSION'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI1MDk3NDl9.QT7BqvYLZ0TdglE3InJPdRm-qyeCTBQ11pNRq5MdTco'
-    return config;
-}, function (error) {
-    // 对请求错误做些什么
-    return Promise.reject(error);
-});
-
-
-
+  // config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+  // console.log(config.headers['ddd'] = '666')
+  config.headers.common['JSESSION'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI4MzAwMDN9.kHaJPPKKp8Rz9fZSwCRmoveuxdnLj1t7D51tLp9hG3Q'
+  return config
+}, function(error) {
+  // 对请求错误做些什么
+  return Promise.reject(error)
+})
 
 // request interceptor
 // service.interceptors.request.use(
