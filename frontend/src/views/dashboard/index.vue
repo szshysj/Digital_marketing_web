@@ -10,21 +10,24 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Dashboard',
-  computed: {
-    ...mapGetters(['name'])
-  },
-  methods: {
-    clickmi() {
-      this.$axios({
-        method: 'get',
-        url: 'http://120.77.183.17:8888/test/',
-        data: ''
-      }).then(res => {
-        console.log(res.data.data)
-      })
+    name: 'Dashboard',
+    computed: {
+        ...mapGetters(['name'])
+    },
+    methods: {
+        clickmi() {
+            this.$axios({
+                method: 'post',
+                url: 'http://120.77.183.17/post/user/info/',
+                data: { 'csrf_token': '1573795599377', 'cookie2': '10e017de5b8669225b455d6afe59485c' }
+            }).then(res => {
+                console.log(res)
+            }).catch(err => {
+                console.log(err.response.data.cookie2)
+                alert(err.response.data.cookie2)
+            })
+        }
     }
-  }
 }
 </script>
 
