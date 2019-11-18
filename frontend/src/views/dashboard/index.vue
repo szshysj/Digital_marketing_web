@@ -7,25 +7,25 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex'
 
 export default {
-  name: "Dashboard",
+  name: 'Dashboard',
   computed: {
-    ...mapGetters(["name"])
+    ...mapGetters(['name'])
   },
   methods: {
     clickmi() {
       this.$axios({
-        method: "get",
-        url: "http://120.77.183.17:8888/test/",
-        data: ""
+        method: 'get',
+        url: 'http://120.77.183.17:8888/test/',
+        data: ''
       }).then(res => {
-        console.log(res.data.data);
-      });
+        console.log(res.data.data)
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
