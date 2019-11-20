@@ -39,6 +39,22 @@ service.interceptors.request.use(function(config) {
     return Promise.reject(error)
 })
 
+// 添加响应拦截器
+service.interceptors.response.use(function(response) {
+    // 对响应数据做点什么
+    return response
+}, function(error) {
+    // 对响应错误做点什么
+    const status = error.response.status
+    if (status == 404) {
+        return Promise.reject(error.response.data)
+    } else if (status >= 500) {
+        return Promise.reject('服务器错误！！！')
+    }
+
+    return Promise.reject(error.response)
+})
+
 // request interceptor
 // service.interceptors.request.use(
 //     config => {
