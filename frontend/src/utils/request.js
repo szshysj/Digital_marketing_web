@@ -20,6 +20,19 @@ service.interceptors.request.use(function(config) {
     // config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     // console.log(config.headers['ddd'] = '666')
     config.headers.common['JSESSION'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI4MzAwMDN9.kHaJPPKKp8Rz9fZSwCRmoveuxdnLj1t7D51tLp9hG3Q'
+    if (config.method === 'post') {
+        config.data = {
+            ...config.data,
+            csrf_token: '1574122458197',
+            cookie2: '10e017de5b8669225b455d6afe59485c'
+        }
+    } else if (config.method === 'get') {
+        config.params = {
+            csrf_token: '1574122458197',
+            cookie2: '10e017de5b8669225b455d6afe59485c',
+            ...config.params
+        }
+    }
     return config
 }, function(error) {
     // 对请求错误做些什么

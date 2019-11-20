@@ -7,3 +7,11 @@ export function getdata(params) {
         params
     })
 }
+
+export function postcampaign(params) {
+    return request({
+        url: '/post/add/campaign/',
+        method: 'POST',
+        data: params
+    })
+}
