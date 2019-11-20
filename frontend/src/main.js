@@ -25,7 +25,7 @@ import '@/permission' // permission control
  */
 import { mockXHR } from '../mock'
 if (process.env.NODE_ENV === 'production') {
-  mockXHR()
+    mockXHR()
 }
 
 // set ElementUI lang to EN
@@ -38,8 +38,8 @@ import Axios from 'axios'
 // 给原型绑定
 Vue.prototype.$axios = Axios
 new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
+    el: '#app',
+    router,
+    store,
+    render: h => h(App)
 })
