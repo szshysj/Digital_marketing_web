@@ -1,7 +1,15 @@
-from Digital_marketing.forms import AdgroupForm, BaseForm
+from Digital_marketing.forms import AdgroupForm, BaseForm, CampaignForm
 
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length, Regexp
 from wtforms import StringField
+
+
+class GetAdgroupKeywordListForm(CampaignForm):
+    adGroupId = StringField('推广单元id', validators=[
+        DataRequired(message='请输入推广单元id'),
+        Length(min=9, max=9, message='请输入正确的推广单元id长度'),
+        Regexp(regex='\\d{9}', message='请输入正确的推广单元id格式')
+    ])
 
 
 class AddOfferKeywordForm(AdgroupForm):
