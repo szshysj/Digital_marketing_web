@@ -74,7 +74,7 @@
           <a target="_blank">《广告服务协议》</a>
         </el-col>
         <el-col :span="11">
-          <el-button type="primary" @click="onSubmit">确认提交</el-button>
+          <el-button type="primary" :disabled="disableds" @click="onSubmit">确认提交</el-button>
         </el-col>
       </el-form-item>
     </el-form>
@@ -114,11 +114,10 @@ export default {
         }
         // 预算价格匹配规则
         const validatequota = (rule, value, callback) => {
-            console.log(value)
             if (value === '' || value === undefined) {
                 callback(new Error('请输入预算价格'))
-            } else if (value < 60 || value > 999999) {
-                callback(new Error('价格在60-999999之间'))
+            } else if (value < 60 || value > 100) {
+                callback(new Error('价格在60-100之间'))
             } else {
                 callback()
             }
@@ -133,6 +132,7 @@ export default {
             checkboxs: false, // 协议勾选
             regionId: null, // 总id数
             regionIdCont: null, // 备份总id
+            disableds: false, // 阻止点击
 
             form: {// 表单数据
                 mane: '',
@@ -248,7 +248,7 @@ export default {
             if (this.checkboxs) {
                 this.$refs.form.validate((valid) => {
                     if (valid) {
-                        console.log(this.form, 111)
+                        this.disableds = true
                         let postCampaginJson = {}
                         postCampaginJson['title'] = this.form.name
                         postCampaginJson['budget'] = this.form.quota
@@ -259,15 +259,21 @@ export default {
                         } else {
                             postCampaginJson['promoteArea'] = this.regionId
                         }
-                        console.log(postCampaginJson, 11111111)
+
                         postcampaign(postCampaginJson).then(res => {
                             console.log(res)
+                            this.disableds = false
+                            this.$refs.form.resetFields()
+                            this.form.radio = 1
+                            this.checkboxs = false
+
+                            this.$message({
+                                message: '恭喜你，提交成功',
+                                type: 'success'
+                            })
                         }).catch(err => {
-                            console.log(err.response)
-                        })
-                        this.$message({
-                            message: '恭喜你，提交成功',
-                            type: 'success'
+                            console.log(err)
+                            this.$message.error('错误！！！')
                         })
                     } else {
                         this.$message.error('请填写字段')
@@ -371,7 +377,7 @@ export default {
             } else {
                 this.isIndeterminate = true
             }
-            console.log('总', this.regionId)
+            // console.log('总', this.regionId)
             // function concatData(arrA, arrB) {
             //     console.log(arrA, arrB)
             //     const concatD = arrA.concat(arrB)
