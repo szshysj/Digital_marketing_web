@@ -20,10 +20,39 @@ service.interceptors.request.use(function(config) {
     // config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     // console.log(config.headers['ddd'] = '666')
     config.headers.common['JSESSION'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI4MzAwMDN9.kHaJPPKKp8Rz9fZSwCRmoveuxdnLj1t7D51tLp9hG3Q'
+    if (config.method === 'post') {
+        config.data = {
+            ...config.data,
+            csrf_token: '1574122458197',
+            cookie2: '10e017de5b8669225b455d6afe59485c'
+        }
+    } else if (config.method === 'get') {
+        config.params = {
+            csrf_token: '1574122458197',
+            cookie2: '10e017de5b8669225b455d6afe59485c',
+            ...config.params
+        }
+    }
     return config
 }, function(error) {
     // 对请求错误做些什么
     return Promise.reject(error)
+})
+
+// 添加响应拦截器
+service.interceptors.response.use(function(response) {
+    // 对响应数据做点什么
+    return response
+}, function(error) {
+    // 对响应错误做点什么
+    const status = error.response.status
+    if (status == 404) {
+        return Promise.reject(error.response.data)
+    } else if (status >= 500) {
+        return Promise.reject('服务器错误！！！')
+    }
+
+    return Promise.reject(error.response)
 })
 
 // request interceptor
