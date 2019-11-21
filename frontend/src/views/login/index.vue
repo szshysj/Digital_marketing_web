@@ -12,13 +12,13 @@
         </span>
         <el-input
           ref="username"
-          v-model="loginForm.username"
+          v-model.number="loginForm.username"
           placeholder="Username"
           name="username"
           type="text"
           tabindex="1"
           auto-complete="on"
-        />
+        />.0
       </el-form-item>
 
       <el-form-item prop="password">
@@ -54,16 +54,32 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import axios from 'axios'
 
 export default {
     name: 'Login',
     data() {
         const validateUsername = (rule, value, callback) => {
-            if (!validUsername(value)) {
-                callback(new Error('Please enter the correct user name'))
-            } else {
-                callback()
+            if (!value) {
+                return callback(new Error('号码不能为空'));
+            }    else{
+              if (!Number.isInteger(value)) {
+                  // console.log(typeof value)
+                  callback(new Error('请输入正确的格式'));
+              } else {
+                  if (String(value).length < 13) {
+                      callback(new Error('长度错误'));
+                  } else {
+                      callback(console.log(value))
+
+                  }
+              }
             }
+            // if (!validUsername(value)) {
+            //     callback(new Error('Please enter the correct user name'))
+            // } else {
+            //     callback()
+            // }
         }
         const validatePassword = (rule, value, callback) => {
             if (value.length < 6) {
@@ -73,9 +89,13 @@ export default {
             }
         }
         return {
+            list: {
+                csrf_token: '',
+                cookie2: ''
+            },
             loginForm: {
-                username: 'admin',
-                password: '111111'
+                username: '',
+                password: ''
             },
             loginRules: {
                 username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -94,6 +114,16 @@ export default {
             immediate: true
         }
     },
+    created() {
+        this.instance = axios.create({
+            // 创建实例
+            baseURL: 'http://120.77.183.17',
+            timeout: 2000
+        })
+
+
+
+    },
     methods: {
         showPwd() {
             if (this.passwordType === 'password') {
@@ -106,19 +136,38 @@ export default {
             })
         },
         handleLogin() {
-            this.$refs.loginForm.validate(valid => {
-                if (valid) {
-                    this.loading = true
-                    this.$store.dispatch('user/login', this.loginForm).then(() => {
-                        this.$router.push({ path: this.redirect || '/' })
-                        this.loading = false
-                    }).catch(() => {
-                        this.loading = false
-                    })
-                } else {
-                    console.log('error submit!!')
-                    return false
-                }
+            // this.$refs.loginForm.validate(valid => {
+            //     if (valid) {
+            //         this.loading = true
+            //         this.$store.dispatch('user/login', this.loginForm).then(() => {
+            //             this.$router.push({ path: this.redirect || '/' })
+            //             this.loading = false
+            //         }).catch(() => {
+            //             this.loading = false
+            //         })
+            //     } else {
+            //         console.log('error submit!!')
+            //         return false
+            //     }
+            // })
+            // console.log(this.list) // this.ruleForm2 会自动匹配data内的值
+            this.list.csrf_token = this.loginForm.username // created 钩子函数会在v-bind传值之前访问，数组传值不能放在created里
+            this.list.cookie2 = this.loginForm.password
+            this.instance.post('/post/user/info/', this.list).then((res) => {
+            console.log(res)
+            this.list = res
+            alert('登陆成功')
+            this.$router.push({ path: '/' })
+            // this.list = res.data
+            }).catch((err) => {
+              console.log(typeof this.list.csrf_token)
+              console.log(this.list.csrf_token)
+              console.log(typeof this.list.cookie2)
+            // this.list = err err.response.data.csrf_token
+              this.list = err.response.data.csrf_token // err.response 获取请求失败的数据。
+            // this.list= '获取接口失败了'
+              alert('登陆失败')
+            // this.$router.push({path:'/'})
             })
         }
     }
