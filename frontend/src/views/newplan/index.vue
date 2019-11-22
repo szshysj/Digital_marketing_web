@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form ref="form" :model="form" :rules="rules" label-width="120px" status-icon>
       <el-form-item label="计划名称：" prop="name">
-        <el-input v-model.trim="form.name" placeholder="计划创建于_20191030_020027" class="input-widht" />
+        <el-input v-model.trim="form.name" class="input-widht" />
       </el-form-item>
       <el-form-item label="消耗上线：" prop="quota">
         <el-input v-model.number="form.quota" class="input-widht" />
@@ -85,6 +85,7 @@
 import { getdata, postcampaign } from '@/api/newplan'
 import regions from '@/components/Newplan/region'
 export default {
+
     components: {
         regions
     },
@@ -136,7 +137,7 @@ export default {
 
             form: {// 表单数据
                 mane: '',
-                quota: 100,
+                quota: 60,
                 directional: true,
                 radio: 1
             },
@@ -192,6 +193,7 @@ export default {
         cositeFlagText() {
             return this.form.directional ? '已开启' : '关闭'
         }
+
     },
     created() {
     // console.log(this);
@@ -240,7 +242,9 @@ export default {
         })
         this.datas = pareD
         this.regionId = dataId
-        this.regionIdCont = dataId
+        this.regionIdCont = dataId// 备份
+        // 添加时间戳
+        this.form.name = this.formatDates()
     },
     methods: {
         // 表单提交
@@ -252,7 +256,7 @@ export default {
                         let postCampaginJson = {}
                         postCampaginJson['title'] = this.form.name
                         postCampaginJson['budget'] = this.form.quota
-                        postCampaginJson['cositeFlag'] = this.form.directional ? 1 : 0
+                        postCampaginJson['cositeFlag'] = this.form.directional ? '1' : '0'
                         postCampaginJson['promoteTime'] = this.form.radio
                         if (this.regionId.length == 35 || this.regionId.length == 0) {
                             postCampaginJson['promoteArea'] = '0'
@@ -263,13 +267,19 @@ export default {
                         postcampaign(postCampaginJson).then(res => {
                             console.log(res)
                             this.disableds = false
-                            this.$refs.form.resetFields()
-                            this.form.radio = 1
-                            this.checkboxs = false
-
                             this.$message({
                                 message: '恭喜你，提交成功',
                                 type: 'success'
+                            })
+                            this.$confirm('是否保留当前数据？', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(_ => {
+                                this.form.name = this.formatDates()
+                            }).catch(_ => {
+                                // 小问题性能缓存
+                                this.$router.go(0)
                             })
                         }).catch(err => {
                             console.log(err)
@@ -277,6 +287,7 @@ export default {
                         })
                     } else {
                         this.$message.error('请填写字段')
+
                         return false
                     }
                 })
@@ -409,10 +420,23 @@ export default {
                 this.isIndeterminate = false
             }
             console.log(this.regionId)
+        },
+        // 获取时间戳戳
+        formatDates(row) {
+            let date = new Date()
+            let Y = date.getFullYear() + '_'
+            let M = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) + '_' : date.getMonth() + 1 + '_'
+            let D = date.getDate() < 10 ? '0' + date.getDate() + ' ' : date.getDate() + ''
+            let h = date.getHours() < 10 ? '0' + date.getHours() + '' : date.getHours() + ''
+            let m = date.getMinutes() < 10 ? '0' + date.getMinutes() + '' : date.getMinutes() + ''
+            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+
+            return '计划创建于' + Y + M + D + h + m + s
         }
 
     }
 }
+
 </script>
 
 <style lang="scss" scoped>

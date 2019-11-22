@@ -66,6 +66,17 @@ export const constantRoutes = [
         }]
     },
     {
+        path: '/getallplan',
+        component: Layout,
+        // redirect: '/dongdong888',
+        children: [{
+            path: 'getallplan',
+            name: 'Getallplan',
+            component: () => import('@/views/getallplan/index'),
+            meta: { title: '全部推广计划', icon: 'getallplan' }
+        }]
+    },
+    {
         path: '/addgoods',
         component: Layout,
         // redirect: '/dongdong888',
@@ -98,6 +109,7 @@ export const constantRoutes = [
             meta: { title: '报表', icon: 'form' }
         }]
     },
+
     {
         hidden: true,
         path: '/example',
