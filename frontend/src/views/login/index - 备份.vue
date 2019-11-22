@@ -12,7 +12,7 @@
         </span>
         <el-input
           ref="username"
-          v-model.number="loginForm.username"
+          v-model="loginForm.username"
           placeholder="Username"
           name="username"
           type="text"
@@ -42,43 +42,28 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-      
+
       <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
       </div>
-    
+
     </el-form>
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
-import axios from 'axios'
 
 export default {
     name: 'Login',
     data() {
         const validateUsername = (rule, value, callback) => {
-            if (!value) {
-                return callback(new Error('号码不能为空'));
-            }   else {
-                if (!Number.isInteger(value)) {                   
-                    callback(new Error('请输入正确的格式'));
-                } else {
-                    if (String(value).length < 13) {
-                        callback(new Error('长度错误'));
-                    } else {
-                        callback(console.log(value))
-                    
-                    }
-                }
+            if (!validUsername(value)) {
+                callback(new Error('Please enter the correct user name'))
+            } else {
+                callback()
             }
-            // if (!validUsername(value)) {
-            //     callback(new Error('Please enter the correct user name'))
-            // } else {
-            //     callback()
-            // }
         }
         const validatePassword = (rule, value, callback) => {
             if (value.length < 6) {
@@ -88,13 +73,9 @@ export default {
             }
         }
         return {
-            list: {
-                csrf_token: '',
-                cookie2: ''
-            },
             loginForm: {
-                username: '',
-                password: ''
+                username: 'admin',
+                password: '111111'
             },
             loginRules: {
                 username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -113,13 +94,6 @@ export default {
             immediate: true
         }
     },
-    created() {
-        this.instance = axios.create({
-            // 创建实例
-            baseURL: 'http://120.77.183.17:8888',
-            timeout: 2000
-        })
-    },
     methods: {
         showPwd() {
             if (this.passwordType === 'password') {
@@ -132,38 +106,19 @@ export default {
             })
         },
         handleLogin() {
-            // this.$refs.loginForm.validate(valid => {
-            //     if (valid) {
-            //         this.loading = true
-            //         this.$store.dispatch('user/login', this.loginForm).then(() => {
-            //             this.$router.push({ path: this.redirect || '/' })
-            //             this.loading = false
-            //         }).catch(() => {
-            //             this.loading = false
-            //         })
-            //     } else {
-            //         console.log('error submit!!')
-            //         return false
-            //     }
-            // })
-            // console.log(this.list) // this.ruleForm2 会自动匹配data内的值
-            this.list.csrf_token = this.loginForm.username // created 钩子函数会在v-bind传值之前访问，数组传值不能放在created里
-            this.list.cookie2 = this.loginForm.password
-            this.instance.post('/post/user/info/', this.list).then((res) => {
-            console.log(res)
-            this.list = res
-            alert('登陆成功')
-            this.$router.push({ path: '/' })
-            // this.list = res.data
-            }).catch((err) => {
-              console.log(typeof this.list.csrf_token)
-              console.log(this.list.csrf_token)
-              console.log(typeof this.list.cookie2)
-            // this.list = err err.response.data.csrf_token
-              this.list = err.response.data.csrf_token // err.response 获取请求失败的数据。
-            // this.list= '获取接口失败了'
-              alert('登陆失败')
-            // this.$router.push({path:'/'})
+            this.$refs.loginForm.validate(valid => {
+                if (valid) {
+                    this.loading = true
+                    this.$store.dispatch('user/login', this.loginForm).then(() => {
+                        this.$router.push({ path: this.redirect || '/' })
+                        this.loading = false
+                    }).catch(() => {
+                        this.loading = false
+                    })
+                } else {
+                    console.log('error submit!!')
+                    return false
+                }
             })
         }
     }
