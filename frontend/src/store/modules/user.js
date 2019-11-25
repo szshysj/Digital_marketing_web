@@ -3,7 +3,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const state = {
-    token: getToken(),
+    token: '', // getToken(),
     name: '',
     avatar: ''
 }
@@ -25,10 +25,11 @@ const actions = {
     login({ commit }, userInfo) {
         const { username, password } = userInfo
         return new Promise((resolve, reject) => {
-            login({ username: username.trim(), password: password }).then(response => {
+            login({ csrf_token: username.toString(), cookie2: password }).then(response => {
                 const { data } = response
-                commit('SET_TOKEN', data.token)
-                setToken(data.token)
+                console.log(data)
+                commit('SET_TOKEN', data)
+                setToken(data)
                 resolve()
             }).catch(error => {
                 reject(error)
@@ -59,20 +60,26 @@ const actions = {
 
     // user logout
     logout({ commit, state }) {
-        return new Promise((resolve, reject) => {
-            logout(state.token).then(() => {
-                commit('SET_TOKEN', '')
-                removeToken()
-                resetRouter()
-                resolve()
-            }).catch(error => {
-                reject(error)
-            })
-        })
+        console.log(state.token)
+        commit('SET_TOKEN', '')
+        removeToken()
+        resetRouter()
+        // return new Promise((resolve, reject) => {
+        //     logout(state.token).then(() => {
+        //         commit('SET_TOKEN', '')
+        //         removeToken()
+        //         resetRouter()
+        //         resolve()
+        //     }).catch(error => {
+        //         reject(error)
+        //     })
+        // })
     },
 
     // remove token
     resetToken({ commit }) {
+        commit('SET_TOKEN', '')
+        removeToken()
         return new Promise(resolve => {
             commit('SET_TOKEN', '')
             removeToken()

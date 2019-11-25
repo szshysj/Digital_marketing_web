@@ -1,7 +1,7 @@
 import axios from 'axios'
-// import { MessageBox, Message } from 'element-ui'
-// import store from '@/store'
-// import { getToken } from '@/utils/auth'
+import { MessageBox, Message } from 'element-ui'
+import store from '@/store'
+import { getToken } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
@@ -15,25 +15,27 @@ const service = axios.create({
 
 service.interceptors.request.use(function(config) {
     // 在发送请求之前做些什么
-    // console.log(123, config.headers)
-
     // config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     // console.log(config.headers['ddd'] = '666')
-    config.headers.common['JSESSION'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI4MzAwMDN9.kHaJPPKKp8Rz9fZSwCRmoveuxdnLj1t7D51tLp9hG3Q'
-    if (config.method === 'post') {
-        config.data = {
-            ...config.data,
-            'csrf_token': '1574393672850',
-            'cookie2': '10e017de5b8669225b455d6afe59485c'
-        }
-    } else if (config.method === 'get') {
-        config.params = {
 
-            csrf_token: '1574393672850',
-            cookie2: '10e017de5b8669225b455d6afe59485c',
-            ...config.params
+    const token = store.getters.token
+    if (token) {
+        if (config.method === 'post') {
+            config.data = {
+                ...config.data,
+                'csrf_token': token.csrf_token,
+                'cookie2': token.cookie2
+            }
+        } else if (config.method === 'get') {
+            config.params = {
+
+                'csrf_token': token.csrf_token,
+                'cookie2': token.cookie2,
+                ...config.params
+            }
         }
     }
+
     return config
 }, function(error) {
     // 对请求错误做些什么
@@ -47,7 +49,22 @@ service.interceptors.response.use(function(response) {
 }, function(error) {
     // 对响应错误做点什么
     const status = error.response.status
+    const errdata = error.response.data
     if (status == 404) {
+        let errText = []
+        for (let item in errdata) {
+            errText.push(errdata[item])
+        }
+        errText = errText.join('\n')
+        MessageBox.confirm(errText, {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'error'
+        }).then(() => {
+            store.dispatch('user/resetToken').then(() => {
+                location.reload()
+            })
+        })
         return Promise.reject(error.response.data)
     } else if (status >= 500) {
         return Promise.reject('服务器错误！！！')

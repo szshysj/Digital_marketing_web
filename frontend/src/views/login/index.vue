@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">Hi</h3>
       </div>
 
       <el-form-item prop="username">
@@ -13,12 +13,12 @@
         <el-input
           ref="username"
           v-model.number="loginForm.username"
-          placeholder="Username"
+          placeholder="用户名"
           name="username"
           type="text"
           tabindex="1"
           auto-complete="on"
-        />.0
+        />
       </el-form-item>
 
       <el-form-item prop="password">
@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="密码"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -41,57 +41,46 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-      
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+
       <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
+        <span style="margin-right:20px;">用户名: csrf_token</span>
+        <span> 密码: cookie2</span>
       </div>
-    
+
     </el-form>
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
-import axios from 'axios'
 
 export default {
     name: 'Login',
     data() {
         const validateUsername = (rule, value, callback) => {
             if (!value) {
-                return callback(new Error('号码不能为空'));
-            }   else {
-                if (!Number.isInteger(value)) {                   
-                    callback(new Error('请输入正确的格式'));
+                return callback(new Error('号码不能为空'))
+            } else {
+                if (!Number.isInteger(value)) {
+                    callback(new Error('请输入正确的格式'))
                 } else {
                     if (String(value).length < 13) {
-                        callback(new Error('长度错误'));
+                        callback(new Error('长度错误，输入13位'))
                     } else {
-                        callback(console.log(value))
-                    
+                        callback()
                     }
                 }
             }
-            // if (!validUsername(value)) {
-            //     callback(new Error('Please enter the correct user name'))
-            // } else {
-            //     callback()
-            // }
         }
         const validatePassword = (rule, value, callback) => {
             if (value.length < 6) {
-                callback(new Error('The password can not be less than 6 digits'))
+                callback(new Error('长度错误'))
             } else {
                 callback()
             }
         }
         return {
-            list: {
-                csrf_token: '',
-                cookie2: ''
-            },
             loginForm: {
                 username: '',
                 password: ''
@@ -113,13 +102,6 @@ export default {
             immediate: true
         }
     },
-    created() {
-        this.instance = axios.create({
-            // 创建实例
-            baseURL: 'http://120.77.183.17:8888',
-            timeout: 2000
-        })
-    },
     methods: {
         showPwd() {
             if (this.passwordType === 'password') {
@@ -132,38 +114,31 @@ export default {
             })
         },
         handleLogin() {
-            // this.$refs.loginForm.validate(valid => {
-            //     if (valid) {
-            //         this.loading = true
-            //         this.$store.dispatch('user/login', this.loginForm).then(() => {
-            //             this.$router.push({ path: this.redirect || '/' })
-            //             this.loading = false
-            //         }).catch(() => {
-            //             this.loading = false
-            //         })
-            //     } else {
-            //         console.log('error submit!!')
-            //         return false
-            //     }
-            // })
-            // console.log(this.list) // this.ruleForm2 会自动匹配data内的值
-            this.list.csrf_token = this.loginForm.username // created 钩子函数会在v-bind传值之前访问，数组传值不能放在created里
-            this.list.cookie2 = this.loginForm.password
-            this.instance.post('/post/user/info/', this.list).then((res) => {
-            console.log(res)
-            this.list = res
-            alert('登陆成功')
-            this.$router.push({ path: '/' })
-            // this.list = res.data
-            }).catch((err) => {
-              console.log(typeof this.list.csrf_token)
-              console.log(this.list.csrf_token)
-              console.log(typeof this.list.cookie2)
-            // this.list = err err.response.data.csrf_token
-              this.list = err.response.data.csrf_token // err.response 获取请求失败的数据。
-            // this.list= '获取接口失败了'
-              alert('登陆失败')
-            // this.$router.push({path:'/'})
+            this.$refs.loginForm.validate(valid => {
+                if (valid) {
+                    this.loading = true
+                    this.$store.dispatch('user/login', this.loginForm).then((res) => {
+                        console.log(res)
+                        this.$router.push({ path: this.redirect || '/' })
+                        this.loading = false
+                    }).catch((err) => {
+                        console.log(err)
+                        // let errText = []
+                        // for (let item in err) {
+                        //     errText.push(err[item])
+                        // }
+                        // errText = errText.join('<br>')
+
+                        // this.$message.error({
+                        //     dangerouslyUseHTMLString: true,
+                        //     message: `<strong>${errText}</strong>`
+                        // })
+                        this.loading = false
+                    })
+                } else {
+                    console.log('error submit!!')
+                    return false
+                }
             })
         }
     }
