@@ -12,8 +12,9 @@ from ujson import loads
 class GetUserBalanceHandler(BaseHandler):
 
     async def get(self):
-        param = loads(self.request.body.decode('utf8'))
-        form = BaseForm.from_json(param)
+        params = self.request.arguments
+        params = {param[0]: param[1][0].decode('utf8') for param in params.items()}
+        form = BaseForm.from_json(params)
 
         if not form.validate():
             return await self.finish(self.error_handle(form))

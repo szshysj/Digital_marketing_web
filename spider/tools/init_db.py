@@ -6,7 +6,7 @@
 # @Email   : d90159@163.com / 351469076@qq.com
 
 from Digital_marketing.settings import database, settings
-from apps.user.models import Account_Info
+from apps.user.models import Account_Info, Offer_Keyword, Offer_Keyword_7days
 from pprint import pprint as pp
 
 from requests import get, post
@@ -15,7 +15,7 @@ from requests import get, post
 
 
 def init():
-    database.create_tables([Account_Info])
+    database.create_tables([Offer_Keyword, Offer_Keyword_7days])
 
 
 def authorization(code):

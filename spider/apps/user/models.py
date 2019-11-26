@@ -1,6 +1,26 @@
 from Digital_marketing.models import BaseModel
 
-from peewee import FixedCharField, DateTimeField, CharField
+from peewee import FixedCharField, DateTimeField, CharField, SmallIntegerField, FloatField
+
+
+class Offer_Keyword_7days(BaseModel):
+    keyword = CharField(max_length=10, null=False, verbose_name='关键词')
+    recommendTags = CharField(max_length=30, null=False, verbose_name='推荐理由')
+    countBuyer = SmallIntegerField(null=False, verbose_name='竞争指数')
+    leftAvgClick7days = FloatField(null=False, verbose_name='点击率')
+    leftAvgPV7days = FloatField(null=False, verbose_name='平均出价')
+    searchAvg7days = SmallIntegerField(null=False, verbose_name='展示指数')
+    update_time = DateTimeField(null=False, verbose_name='更新时间')
+
+
+class Offer_Keyword(BaseModel):
+    keyword = CharField(max_length=10, null=False, unique=True, verbose_name='关键词')
+    recommendTags = CharField(max_length=30, null=False, verbose_name='推荐理由')
+    countBuyer = SmallIntegerField(null=False, verbose_name='竞争指数')
+    leftAvgClick7days = FloatField(null=False, verbose_name='点击率')
+    leftAvgPV7days = FloatField(null=False, verbose_name='平均出价')
+    searchAvg7days = SmallIntegerField(null=False, verbose_name='展示指数')
+    update_time = DateTimeField(null=False, verbose_name='更新时间')
 
 
 class Account_Info(BaseModel):
