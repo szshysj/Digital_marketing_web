@@ -40,14 +40,29 @@ module.exports = {
         proxy: {
             // change xxx-api/login => mock/login
             // detail: https://cli.vuejs.org/config/#devserver-proxy
-            [process.env.VUE_APP_BASE_API]: {
-                target: `http://120.77.183.17:8888`,
-                changeOrigin: true,
+            // [process.env.VUE_APP_BASE_API]: {
+            //     target: `http://120.77.183.17:8888`,
+            //     changeOrigin: true,
+            //     pathRewrite: {
+            //         ['^' + process.env.VUE_APP_BASE_API]: ''
+            //     }
+            // },
+            '/api': { // 使用"/api"来代替"http://f.apiplus.c"
+                target: 'http://f.apiplus.cn', // 源地址
+                changeOrigin: true, // 改变源
                 pathRewrite: {
-                    ['^' + process.env.VUE_APP_BASE_API]: ''
+                    '^/api': 'http://f.apiplus.cn' // 路径重写
+                }
+            },
+            '/api2': { // 使用"/api"来代替"http://f.apiplus.c"
+                target: 'https://p4p.1688.com/', // 源地址
+                changeOrigin: true, // 改变源
+                pathRewrite: {
+                    '^/api': 'https://p4p.1688.com/' // 路径重写
                 }
             }
         }
+
     // after: require('./mock/mock-server.js')
     },
     configureWebpack: {

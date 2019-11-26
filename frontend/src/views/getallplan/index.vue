@@ -3,7 +3,7 @@
     <!-- header -->
     <div class="filter-container">
       <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
+      <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
       </el-select>
       <el-select v-model="listQuery.type" placeholder="Type" clearable class="filter-item" style="width: 130px">
@@ -11,19 +11,19 @@
       </el-select>
       <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select>
+      </el-select> -->
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
       </el-button>
       <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
         reviewer
-      </el-checkbox>
+      </el-checkbox> -->
     </div>
     <!-- content -->
     <el-table
@@ -34,34 +34,111 @@
       fit
       highlight-current-row
       style="width: 100%;"
+      :default-sort="{prop: 'id', order: 'descending'}"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column
+        align="center"
+        type="selection"
+        width="55"
+        fixed="left"
+      />
+      <!-- <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+          <el-checkbox :ids="row.id" />
         </template>
-      </el-table-column>
-      <el-table-column label="Date" width="150px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.strGMTCreate }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Title" min-width="150px">
+      </el-table-column> -->
+      <el-table-column label="计划名称" width="250px" fixed="left">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
           <!-- <el-tag>{{ row.type | typeFilter }}</el-tag> -->
         </template>
       </el-table-column>
-      <el-table-column label="Author" width="110px" align="center">
+      <el-table-column label="状态" width="150px" align="center">
+        <template slot-scope="{row}">
+          <el-select :value="options[row.state]" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="单元数" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.adGroupCount }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="关键词数" width="110px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.state }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
+
+      <el-table-column label="消耗上限" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.budget }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="消耗" width="110px" align="center">
         <template slot-scope="{row}">
           <span style="color:red;">{{ row.priceMode }}</span>
         </template>
       </el-table-column>
+
+      <el-table-column label="展现次数" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span style="color:red;">{{ row.priceMode }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="点击次数" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span style="color:red;">{{ row.priceMode }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="平均点击花费" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span style="color:red;">{{ row.priceMode }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="收藏店铺数" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span style="color:red;">{{ row.priceMode }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="收藏商品数" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span style="color:red;">{{ row.priceMode }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="询盘数" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span style="color:red;">{{ row.priceMode }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="点击率" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span style="color:red;">{{ row.priceMode }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column v-if="showReviewer" label="点击率" width="110px" align="center">
+        <template slot-scope="{row}">
+          <span style="color:red;">{{ row.priceMode }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="Imp" width="80px">
         <template slot-scope="{row}">
           <span>{{ row.keywordMode }}</span>
@@ -82,19 +159,19 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width" fixed="right">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+            修改
           </el-button>
-          <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
+          <!-- <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
             Publish
           </el-button>
           <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
             Draft
-          </el-button>
+          </el-button> -->
           <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
-            Delete
+            删除
           </el-button>
         </template>
       </el-table-column>
@@ -109,6 +186,11 @@ export default {
     data() {
         return {
             tableKey: 0, // 新增列表格
+            options: {
+                '1': '推广中',
+                '-1': '手动暂停',
+                '6': '不在投放时间下线，自动暂停'
+            },
             listQuery: {// 双向数据绑定
                 page: 1,
                 limit: 20,
@@ -170,6 +252,19 @@ export default {
         }, // 排序样式发生改变
         getSortClass: function(key) {
             console.log(key, '我是排序功能样式')
+        },
+        // 选中的值
+        handleSelectionChange(val) {
+            this.multipleSelection = val
+            console.log(val)
+        },
+        // 修改标题
+        handleUpdate(val) {
+            console.log(val)
+        },
+        // 删除
+        handleModifyStatus(val, status) {
+            console.log(status)
         }
     }
 }
