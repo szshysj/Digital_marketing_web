@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form ref="form" :model="form" :rules="rules" label-width="120px" status-icon>
       <el-form-item label="计划名称：" prop="name">
-        <el-input v-model="form.name" class="input-widht" />
+        <el-input v-model.trim="form.name" class="input-widht" />
       </el-form-item>
       <el-form-item label="消耗上线：" prop="quota">
         <el-input v-model.number="form.quota" class="input-widht" />
