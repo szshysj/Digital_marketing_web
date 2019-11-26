@@ -8,7 +8,7 @@ const service = axios.create({
     baseURL: 'http://120.77.183.17:8888', // 'http://120.77.183.17:8888',//process.env.VUE_APP_BASE_API, //'http://127.0.0.1:3000',// url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
     timeout: 5000 // request timeout
-    // headers: { 'JSESSION': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI1MDk3NDl9.QT7BqvYLZ0TdglE3InJPdRm-qyeCTBQ11pNRq5MdTco" }
+    // headers: { 'JSESSION': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImIyYi0yMjAxNDIxNzE4NjgzMjhmNDAiLCJleHAiOjE1NzI1MDk3NDl9.QT7BqvYLZ0TdglE3InJPdRm-qyeCTBQ11pNRq5MdTco' }
 })
 
 // 添加请求拦截器

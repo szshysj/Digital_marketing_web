@@ -125,6 +125,7 @@ export default {
         }
 
         return {
+            valuea: '123',
             Timelot: false, // 弹出窗时间
             region: false, // 弹出窗地区
             datas: null, // 地区中数据
@@ -136,7 +137,7 @@ export default {
             disableds: false, // 阻止点击
 
             form: {// 表单数据
-                mane: '',
+                name: '',
                 quota: 60,
                 directional: true,
                 radio: 1
@@ -244,6 +245,7 @@ export default {
         this.regionId = dataId
         this.regionIdCont = dataId// 备份
         // 添加时间戳
+
         this.form.name = this.formatDates()
     },
     methods: {
