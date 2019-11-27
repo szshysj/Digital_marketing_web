@@ -12,7 +12,7 @@
       <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select> -->
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
@@ -29,12 +29,12 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="list"
+      :data="list.slice((listQuery.page-1)*listQuery.limit,listQuery.page*listQuery.limit)"
       border
       fit
       highlight-current-row
       style="width: 100%;"
-      :default-sort="{prop: 'id', order: 'descending'}"
+      :default-sort="{prop: 'id', order: 'ascending'}"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
     >
@@ -159,8 +159,13 @@
           </el-tag>
         </template>
       </el-table-column>
+
+      <!-- 按钮功能 -->
       <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width" fixed="right">
         <template slot-scope="{row}">
+          <el-button type="success" size="mini" @click="goodsPlan(row)">
+            查看
+          </el-button>
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button>
@@ -176,28 +181,36 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 分页 -->
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+
   </div>
 
 </template>
 
 <script>
-import { campaign } from '@/api/getallplan'
+import { campaign } from '@/api/getallplan' // api
+import Pagination from '@/components/Pagination' // 分页组件
 export default {
+    components: { Pagination },
     data() {
         return {
+
             tableKey: 0, // 新增列表格
             options: {
                 '1': '推广中',
                 '-1': '手动暂停',
                 '6': '不在投放时间下线，自动暂停'
             },
+            total: 0, // 总页数
             listQuery: {// 双向数据绑定
                 page: 1,
-                limit: 20,
+                limit: 10,
                 importance: undefined,
                 title: undefined,
                 type: undefined,
-                sort: '+id'
+                sort: '-id'
             },
             importanceOptions: [1, 2, 3], // 选择框
             calendarTypeOptions: [// 类型控制
@@ -213,7 +226,7 @@ export default {
             downloadLoading: false, // 下载exel
             showReviewer: false, // 新增列表格
             listLoading: true, // 内容loading
-            list: null // 总数据
+            list: [] // 总数据
         }
     },
     created() {
@@ -227,6 +240,7 @@ export default {
                 console.log(res)
                 const data = res.data.data.campaignVOList
                 this.list = data
+                this.total = data.length
                 console.log(data, data.length)
                 this.listLoading = false
             }).catch(err => {
@@ -241,6 +255,10 @@ export default {
         // add
         handleCreate() {
             console.log('我是添加')
+            this.$message({
+                message: '我是添加',
+                type: 'success'
+            })
         },
         // 下载exle文件
         handleDownload() {
@@ -261,10 +279,36 @@ export default {
         // 修改标题
         handleUpdate(val) {
             console.log(val)
+            this.$confirm('我是修改计划', '修改', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.$message({
+                    type: 'success',
+                    message: '成功!'
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '取消'
+                })
+            })
         },
         // 删除
         handleModifyStatus(val, status) {
-            console.log(status)
+            console.log(val, status)
+            this.$message({
+                message: `我是删除${status}`,
+                type: 'success'
+            })
+        },
+        // 跳转推广单元商品
+        goodsPlan(val) {
+            const goodsId = val.id
+            console.log(goodsId, '我是推广单元商品跳转')
+
+            this.$router.push({ path: '/getallplan/addgoods', query: { id: goodsId }})
         }
     }
 }
