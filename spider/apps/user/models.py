@@ -10,7 +10,7 @@ class Offer_Keyword_7days(BaseModel):
     leftAvgClick7days = FloatField(null=False, verbose_name='点击率')
     leftAvgPV7days = FloatField(null=False, verbose_name='平均出价')
     searchAvg7days = SmallIntegerField(null=False, verbose_name='展示指数')
-    update_time = DateTimeField(null=False, verbose_name='更新时间')
+    update_time = CharField(null=False, max_length=10, verbose_name='更新时间')
 
 
 class Offer_Keyword(BaseModel):
@@ -21,7 +21,7 @@ class Offer_Keyword(BaseModel):
     leftAvgClick7days = FloatField(null=False, verbose_name='点击率')
     leftAvgPV7days = FloatField(null=False, verbose_name='平均出价')
     searchAvg7days = SmallIntegerField(null=False, verbose_name='展示指数')
-    update_time = DateTimeField(null=False, verbose_name='更新时间')
+    update_time = CharField(null=False, max_length=10, verbose_name='更新时间')
 
 
 class Account_Info(BaseModel):

@@ -7,34 +7,62 @@ from apps.keyword.forms import GetOfferKeywordForm, GetOfferKeywordCpcForm, AddO
     GetAdgroupKeywordListForm
 from apps.user.models import Offer_Keyword, Offer_Keyword_7days
 from datetime import datetime
+from playhouse.shortcuts import model_to_dict
 
 from ujson import loads
 
 
 class AddKeywordToMysqlHandler(BaseHandler):
 
+    @staticmethod
+    def split_date(date):
+        return str(date).split()[0]
+
     async def post(self):
         param = loads(self.request.body.decode('utf8'))
 
         # 遍历每一条数据
         for data in param['keyword_list']:
+
+            # 无论怎样, 都将数据保存到 '历史' 库
+            async with self.application.objects.atomic():
+                await self.application.objects.create(Offer_Keyword_7days,
+                                                      keyword=data[0],
+                                                      recommendTags=data[1],
+                                                      countBuyer=data[2],
+                                                      leftAvgClick7days=round(data[3], 2),
+                                                      leftAvgPV7days=round(data[4], 2),
+                                                      searchAvg7days=data[5],
+                                                      update_time=data[-1])
+
+            # 能查到数据
             try:
-                # 能查到数据
-                await self.application.objects.get(
-                    Offer_Keyword.select(Offer_Keyword.keyword).where(Offer_Keyword.keyword == data[0]))
+                sql_data = await self.application.objects.get(
+                    Offer_Keyword.select(Offer_Keyword.keyword,
+                                         Offer_Keyword.update_time
+                                         ).where(Offer_Keyword.keyword == data[0]))
+                # 将结果dict化
+                sql_data = model_to_dict(sql_data)
+
+                # 如果数据是当天, 则不用更新数据, 跳过
+                if data[-1] == self.split_date(sql_data['update_time']):
+                    continue
 
                 # 开启事务, update数据, 失败自动rollback
                 async with self.application.objects.atomic():
-                    await self.application.objects.execute(Offer_Keyword.update(
-                        recommendTags=data[1],
-                        countBuyer=data[2],
-                        leftAvgClick7days=round(data[3], 2),
-                        leftAvgPV7days=round(data[4], 2),
-                        searchAvg7days=data[5],
-                        update_time=datetime.now()
-                    ).where(Offer_Keyword.keyword == data[0]))
+                    await self.application.objects.execute(
+                        Offer_Keyword.update(
+                            recommendTags=data[1],
+                            countBuyer=data[2],
+                            leftAvgClick7days=round(data[3], 2),
+                            leftAvgPV7days=round(data[4], 2),
+                            searchAvg7days=data[5],
+                            update_time=data[-1]
+                        ).where(Offer_Keyword.keyword == data[0])
+                    )
 
-            except Offer_Keyword.DoesNotExist:  # 找不到数据, 作insert操作
+            # 找不到数据, 做insert操作
+            except Offer_Keyword.DoesNotExist:
                 # 保存数据到 "唯一" 的库
                 async with self.application.objects.atomic():
                     await self.application.objects.create(Offer_Keyword,
@@ -44,18 +72,7 @@ class AddKeywordToMysqlHandler(BaseHandler):
                                                           leftAvgClick7days=round(data[3], 2),
                                                           leftAvgPV7days=round(data[4], 2),
                                                           searchAvg7days=data[5],
-                                                          update_time=datetime.now())
-
-            # 保存数据到 '历史' 库
-            async with self.application.objects.atomic():
-                await self.application.objects.create(Offer_Keyword_7days,
-                                                      keyword=data[0],
-                                                      recommendTags=data[1],
-                                                      countBuyer=data[2],
-                                                      leftAvgClick7days=round(data[3], 2),
-                                                      leftAvgPV7days=round(data[4], 2),
-                                                      searchAvg7days=data[5],
-                                                      update_time=datetime.now())
+                                                          update_time=data[-1])
 
         await self.finish('finish')
 
