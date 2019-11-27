@@ -1,6 +1,6 @@
 from Digital_marketing.models import BaseModel
 
-from peewee import FixedCharField, DateTimeField, CharField, SmallIntegerField, FloatField
+from peewee import FixedCharField, DateTimeField, CharField, SmallIntegerField, FloatField, PrimaryKeyField
 
 
 class Offer_Keyword_7days(BaseModel):
@@ -14,6 +14,7 @@ class Offer_Keyword_7days(BaseModel):
 
 
 class Offer_Keyword(BaseModel):
+    id = PrimaryKeyField(verbose_name='主键id')
     keyword = CharField(max_length=10, null=False, unique=True, verbose_name='关键词')
     recommendTags = CharField(max_length=30, null=False, verbose_name='推荐理由')
     countBuyer = SmallIntegerField(null=False, verbose_name='竞争指数')

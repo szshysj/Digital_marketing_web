@@ -1,6 +1,7 @@
+from apps.offer.handler import GetOfferHandler
+
 from tornado.web import url
-from apps.offer.handler import GetCampaignOfferHandler
 
 urls_pattern = [
-    url('/get/campaign/offer/', GetCampaignOfferHandler)
+    url('/get/offer/', GetOfferHandler)
 ]

@@ -19,36 +19,43 @@ class AddKeywordToMysqlHandler(BaseHandler):
         # 遍历每一条数据
         for data in param['keyword_list']:
             try:
-                # 能查到数据, 作update操作
-                keyword_data = await self.application.objects.get(Offer_Keyword, keyword=data[0])
-                keyword_data.recommendTags = data[1]
-                keyword_data.countBuyer = data[2]
-                keyword_data.leftAvgClick7days = data[3]
-                keyword_data.leftAvgPV7days = data[4]
-                keyword_data.searchAvg7days = data[5]
-                keyword_data.update_time = datetime.now()
+                # 能查到数据
+                await self.application.objects.get(
+                    Offer_Keyword.select(Offer_Keyword.keyword).where(Offer_Keyword.keyword == data[0]))
+
+                # 开启事务, update数据, 失败自动rollback
+                async with self.application.objects.atomic():
+                    await self.application.objects.execute(Offer_Keyword.update(
+                        recommendTags=data[1],
+                        countBuyer=data[2],
+                        leftAvgClick7days=round(data[3], 2),
+                        leftAvgPV7days=round(data[4], 2),
+                        searchAvg7days=data[5],
+                        update_time=datetime.now()
+                    ).where(Offer_Keyword.keyword == data[0]))
+
             except Offer_Keyword.DoesNotExist:  # 找不到数据, 作insert操作
-                await self.application.objects.create(Offer_Keyword,
+                # 保存数据到 "唯一" 的库
+                async with self.application.objects.atomic():
+                    await self.application.objects.create(Offer_Keyword,
+                                                          keyword=data[0],
+                                                          recommendTags=data[1],
+                                                          countBuyer=data[2],
+                                                          leftAvgClick7days=round(data[3], 2),
+                                                          leftAvgPV7days=round(data[4], 2),
+                                                          searchAvg7days=data[5],
+                                                          update_time=datetime.now())
+
+            # 保存数据到 '历史' 库
+            async with self.application.objects.atomic():
+                await self.application.objects.create(Offer_Keyword_7days,
                                                       keyword=data[0],
                                                       recommendTags=data[1],
                                                       countBuyer=data[2],
-                                                      leftAvgClick7days=data[3],
-                                                      leftAvgPV7days=data[4],
+                                                      leftAvgClick7days=round(data[3], 2),
+                                                      leftAvgPV7days=round(data[4], 2),
                                                       searchAvg7days=data[5],
                                                       update_time=datetime.now())
-            else:
-                # 保存新数据入 '唯一' 的库
-                await self.application.objects.update(keyword_data)
-
-            # 保存数据到 '历史' 库
-            await self.application.objects.create(Offer_Keyword_7days,
-                                                  keyword=data[0],
-                                                  recommendTags=data[1],
-                                                  countBuyer=data[2],
-                                                  leftAvgClick7days=round(data[3], 2),
-                                                  leftAvgPV7days=round(data[4], 2),
-                                                  searchAvg7days=data[5],
-                                                  update_time=datetime.now())
 
         await self.finish('finish')
 

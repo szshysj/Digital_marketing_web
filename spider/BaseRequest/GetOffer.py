@@ -1,7 +1,7 @@
 from BaseRequest.BaseApi import BaseApi
 
 
-class GetCampaignOffer(BaseApi):
+class GetOffer(BaseApi):
 
     @staticmethod
     async def get(session, form):
