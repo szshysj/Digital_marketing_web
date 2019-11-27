@@ -68,26 +68,34 @@ export const constantRoutes = [
     {
         path: '/getallplan',
         component: Layout,
-        // redirect: '/dongdong888',
+        redirect: '/getallplan/getallplan',
+        name: 'Getallplan',
+        meta: { title: '计划', icon: 'example' },
         children: [{
             path: 'getallplan',
             name: 'Getallplan',
             component: () => import('@/views/getallplan/index'),
             meta: { title: '全部推广计划', icon: 'getallplan' }
-        }]
-    },
-    {
-        path: '/addgoods',
-        component: Layout,
-        // redirect: '/dongdong888',
-        children: [{
-            path: 'addgoods',
+        },
+        { hidden: true,
+            path: '/getallplan/addgoods',
             name: 'Addgoods',
             component: () => import('@/views/addgoods/index'),
             meta: { title: '推广产品', icon: 'addgoods' }
         }]
     },
-    {
+    // {
+    //     path: '/addgoods',
+    //     component: Layout,
+    //     // redirect: '/dongdong888',
+    //     children: [{
+    //         path: 'addgoods',
+    //         name: 'Addgoods',
+    //         component: () => import('@/views/addgoods/index'),
+    //         meta: { title: '推广产品', icon: 'addgoods' }
+    //     }]
+    // },
+    { hidden: true,
         path: '/updateplan',
         component: Layout,
         // redirect: '/dongdong888',
