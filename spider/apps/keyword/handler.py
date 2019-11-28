@@ -6,17 +6,12 @@ from BaseRequest.GetAdgroupKeywordList import GetAdgroupKeywordList
 from apps.keyword.forms import GetOfferKeywordForm, GetOfferKeywordCpcForm, AddOfferKeywordForm, \
     GetAdgroupKeywordListForm
 from apps.user.models import Offer_Keyword, Offer_Keyword_7days
-from datetime import datetime
 from playhouse.shortcuts import model_to_dict
 
 from ujson import loads
 
 
 class AddKeywordToMysqlHandler(BaseHandler):
-
-    @staticmethod
-    def split_date(date):
-        return str(date).split()[0]
 
     async def post(self):
         param = loads(self.request.body.decode('utf8'))
@@ -39,13 +34,13 @@ class AddKeywordToMysqlHandler(BaseHandler):
             try:
                 sql_data = await self.application.objects.get(
                     Offer_Keyword.select(Offer_Keyword.keyword,
-                                         Offer_Keyword.update_time
+                                         Offer_Keyword.keyword_update_time
                                          ).where(Offer_Keyword.keyword == data[0]))
                 # 将结果dict化
                 sql_data = model_to_dict(sql_data)
 
                 # 如果数据是当天, 则不用更新数据, 跳过
-                if data[-1] == self.split_date(sql_data['update_time']):
+                if data[-1] == str(sql_data['keyword_update_time']):
                     continue
 
                 # 开启事务, update数据, 失败自动rollback
@@ -57,7 +52,7 @@ class AddKeywordToMysqlHandler(BaseHandler):
                             leftAvgClick7days=round(data[3], 2),
                             leftAvgPV7days=round(data[4], 2),
                             searchAvg7days=data[5],
-                            update_time=data[-1]
+                            keyword_update_time=data[-1]
                         ).where(Offer_Keyword.keyword == data[0])
                     )
 
@@ -72,7 +67,7 @@ class AddKeywordToMysqlHandler(BaseHandler):
                                                           leftAvgClick7days=round(data[3], 2),
                                                           leftAvgPV7days=round(data[4], 2),
                                                           searchAvg7days=data[5],
-                                                          update_time=data[-1])
+                                                          keyword_update_time=data[-1])
 
         await self.finish('finish')
 
