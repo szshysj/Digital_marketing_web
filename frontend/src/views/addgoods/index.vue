@@ -251,7 +251,7 @@ export default {
                     for (let i = 0; i < dataId.length; i++) {
                         dataArr.push(dataId[i].id)
                     }
-                    dataStar['adGroupIds'] = dataArr.join('')
+                    dataStar['adGroupIds'] = dataArr.join(',')
                     console.log(dataStar)
                     campaignAdgroupInfo(dataStar).then(res => {
                         console.log(res)
