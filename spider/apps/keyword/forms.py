@@ -4,6 +4,10 @@ from wtforms.validators import DataRequired, Length, Regexp
 from wtforms import StringField
 
 
+class GetAnalyizerResultByWordForm(BaseForm):
+    word = StringField('分词后的单个值', validators=[DataRequired(message='请输入分词后的单个值')])
+
+
 class GetAdgroupKeywordListForm(CampaignForm):
     adGroupId = StringField('推广单元id', validators=[
         DataRequired(message='请输入推广单元id'),

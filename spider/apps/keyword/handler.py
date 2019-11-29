@@ -3,12 +3,34 @@ from BaseRequest.GetOfferKeyword import GetOfferKeyword
 from BaseRequest.GetOfferKeywordCpc import GetOfferKeywordCpc
 from BaseRequest.AddOfferKeyword import AddOfferKeyword
 from BaseRequest.GetAdgroupKeywordList import GetAdgroupKeywordList
+from BaseRequest.GetAnalyizerResultByWord import GetAnalyizerResultByWord
 from apps.keyword.forms import GetOfferKeywordForm, GetOfferKeywordCpcForm, AddOfferKeywordForm, \
-    GetAdgroupKeywordListForm
+    GetAdgroupKeywordListForm, GetAnalyizerResultByWordForm
 from apps.user.models import Offer_Keyword, Offer_Keyword_7days
 from playhouse.shortcuts import model_to_dict
 
 from ujson import loads
+
+
+class GetAnalyizerResultByWordHandler(BaseHandler):
+
+    async def get(self):
+        params = self.request.arguments
+        params = {param[0]: param[1][0].decode('utf8') for param in params.items()}
+        form = GetAnalyizerResultByWordForm.from_json(params)
+
+        if not form.validate():
+            return await self.finish(self.error_handle(form))
+
+        text = await GetAnalyizerResultByWord.get(self.application.session, form)
+
+        try:
+            data = loads(text)
+        except ValueError:
+            self.set_status(404)
+            return await self.finish({'msg': '状态失效, 需要重新登录'})
+
+        await self.finish(data)
 
 
 class AddKeywordToMysqlHandler(BaseHandler):
