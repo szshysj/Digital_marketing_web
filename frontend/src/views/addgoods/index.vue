@@ -165,7 +165,7 @@
       <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width" fixed="right">
         <template slot-scope="{row}">
           <el-button type="success" size="mini" @click="goodsPlan(row)">
-            查看
+            关键字
           </el-button>
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
@@ -327,10 +327,10 @@ export default {
         },
         // 跳转推广单元商品
         goodsPlan(val) {
-            const goodsId = val.id
-            console.log(goodsId, '我是推广单元商品跳转')
-
-            this.$router.push({ path: '/getallplan/addgoods', query: { id: goodsId }})
+            const title = val.title
+            // console.log(goodsId, '我是推广单元商品跳转')
+            // console.log(val)
+            this.$router.push({ path: '/getallplan/keywords', query: { title: title }})
         }
     }
 }
