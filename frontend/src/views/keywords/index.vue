@@ -2,7 +2,7 @@
   <div>
     <div>
       分词页面
-      <input v-model='source' placeholder="化核加应子一箱24公斤湿乌梅子蜜饯果脯凉果散装批发潮汕特产"/>
+      <input v-model="source" placeholder="化核加应子一箱24公斤湿乌梅子蜜饯果脯凉果散装批发潮汕特产">
       <button @click="get">提交</button>
       <div>{{ value }}</div>
     </div>
@@ -24,9 +24,9 @@ export default {
     },
     methods: {
         get() {
-             this.$axios({
+            this.$axios({
                 method: 'get',
-                url: 'http://120.77.183.17/analyizer',
+                url: '/api/analyizer',
                 params: {
                     source: this.source,
                     param1: 0,

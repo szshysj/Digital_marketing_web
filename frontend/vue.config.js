@@ -47,18 +47,26 @@ module.exports = {
             //         ['^' + process.env.VUE_APP_BASE_API]: ''
             //     }
             // },
+            // '/api': { // 使用"/api"来代替"http://f.apiplus.c"
+            //     target: 'http://f.apiplus.cn', // 源地址
+            //     changeOrigin: true, // 改变源
+            //     pathRewrite: {
+            //         '^/api': 'http://f.apiplus.cn' // 路径重写
+            //     }
+            // },
+            // '/api2': { // 使用"/api"来代替"http://f.apiplus.c"
+            //     target: 'https://p4p.1688.com/', // 源地址
+            //     changeOrigin: true, // 改变源
+            //     pathRewrite: {
+            //         '^/api': 'https://p4p.1688.com/' // 路径重写
+            //     }
+            // },
+            // 第三方分词
             '/api': { // 使用"/api"来代替"http://f.apiplus.c"
-                target: 'http://f.apiplus.cn', // 源地址
+                target: 'http://120.77.183.17:80/', // 源地址
                 changeOrigin: true, // 改变源
                 pathRewrite: {
-                    '^/api': 'http://f.apiplus.cn' // 路径重写
-                }
-            },
-            '/api2': { // 使用"/api"来代替"http://f.apiplus.c"
-                target: 'https://p4p.1688.com/', // 源地址
-                changeOrigin: true, // 改变源
-                pathRewrite: {
-                    '^/api': 'https://p4p.1688.com/' // 路径重写
+                    '^/api': 'http://120.77.183.17:80/' // 路径重写
                 }
             }
         }
