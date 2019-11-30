@@ -7,9 +7,19 @@ class GetAnalyizerResultByWord(BaseApi):
     async def get(session, form):
         params = {
             "query": {
-                "query_string": {
-                    "default_field": "keyword",
-                    "query": form.word.data
+                "bool": {
+                    "must": [
+                        {
+                            "match": {
+                                "keyword": form.word.data
+                            }
+                        },
+                        {
+                            "match": {
+                                "category": form.category.data
+                            }
+                        }
+                    ]
                 }
             }
         }

@@ -6,6 +6,10 @@ from wtforms import StringField
 
 class GetAnalyizerResultByWordForm(BaseForm):
     word = StringField('分词后的单个值', validators=[DataRequired(message='请输入分词后的单个值')])
+    category = StringField('关键词类目', validators=[
+        DataRequired(message='请输入关键词类目'),
+        Length(min=1, max=10, message='请输入类目正确的长度')
+    ])
 
 
 class GetAdgroupKeywordListForm(CampaignForm):
