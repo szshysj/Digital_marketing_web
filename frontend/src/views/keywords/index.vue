@@ -2,9 +2,8 @@
   <div>
     <div>
       分词页面
-      <input v-model="source" placeholder="化核加应子一箱24公斤湿乌梅子蜜饯果脯凉果散装批发潮汕特产">
-      <button @click="get">提交</button>
-<<<<<<< HEAD
+      <!-- <input v-model="source" placeholder="化核加应子一箱24公斤湿乌梅子蜜饯果脯凉果散装批发潮汕特产">
+      <button @click="get">提交</button> -->
       <div class="inline">
         <ul>
           <el-button
@@ -17,13 +16,12 @@
           >{{ title.t }}</el-button>
         </ul>
       </div>
-      <!-- <div>{{ words_title }}</div>
-      <div>{{ keywords_gather }}</div> -->
-      <div>{{ category }}</div>
-=======
-      <div>{{ value }}</div>
->>>>>>> parent of b00d115... 分词&关键词筛选
+      <!-- <div>{{ words_title }}</div> -->
+      <div>{{ keywords_gather }}</div>
+      <div>{{ zzz }}</div>
+      <!-- <div>{{ value }}</div> -->
     </div>
+    <!-- 标签 -->
   </div>
 </template>
 
@@ -31,16 +29,20 @@
 export default {
     data() {
         return {
+            zzz: [],
+            key_all: [], // 所有关键词
+            key_cpc: [], // cpc单个关键词
+            key_all_index: [], // recommendTags，keyword
+            key_cpc_all: [], // cpc 所有关键词
+            keywords_gather: [], // 整合后的数据
+            month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], // 进行月份枚举
+            category: [], // 类目信息
             source: '化核加应子一箱24公斤湿乌梅子蜜饯果脯凉果散装批发潮汕特产',
-<<<<<<< HEAD
             words_title: '', // 存放点击时的标签值
-=======
->>>>>>> parent of b00d115... 分词&关键词筛选
             value: [] // { "t": "化核", "p": "0.945319" }, { "t": "加应子", "p": "0.87609" },
         }
     },
     created() {
-<<<<<<< HEAD
         this.value_t = this.value.t
         // 获取所有关键词 & 获取所有cpc关键词
         this.$axios({
@@ -88,8 +90,6 @@ export default {
                     })
                 }
                 this.key_words()
-                // 上传数据
-                // this.upload_data()
             }).catch(err => {
                 console.log(err.response)
                 alert('获取cpc失败')
@@ -141,7 +141,7 @@ export default {
                     csrf_token: '1575283943246',
                     cookie2: '175203fa7876f0e9213abb3cfaa83e47'
                 }}).then(res => {
-                  this.zzz = res
+                    this.zzz = res
                 console.log(res)
                 alert('登陆成功')
             }).catch( () => {
@@ -153,17 +153,6 @@ export default {
             this.$axios({
                 method: 'get',
                 url: '/analyizer/get.php',
-=======
-        // let title = this.$route.query.title
-        // console.log(title)
-        // alert(title)
-    },
-    methods: {
-        get() {
-            this.$axios({
-                method: 'get',
-                url: '/api/analyizer',
->>>>>>> parent of b00d115... 分词&关键词筛选
                 params: {
                     source: this.source,
                     param1: 0,
@@ -178,7 +167,6 @@ export default {
                     b.p = parseFloat(b.p)
                     return b.p - a.p
                 })
-<<<<<<< HEAD
                 console.log(res.data)
                 this.value = res.data
                 // this.cities = this.value.t
@@ -231,15 +219,18 @@ export default {
                 console.log('上传成功')
             })
             console.log(this.keywords_gather)
-=======
-                this.value = res
-            })
->>>>>>> parent of b00d115... 分词&关键词筛选
         }
     }
 }
 </script>
 
 <style lang="scss" scoped>
-
+  .inline ul {
+    list-style: none;
+    /* border-bottom: 1px solid #7D7E80; */
+  }
+  .inline ul li {
+    display: inline-block;
+    width: 11%;
+  }
 </style>
