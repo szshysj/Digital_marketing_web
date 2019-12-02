@@ -16,8 +16,9 @@
           >{{ title.t }}</el-button>
         </ul>
       </div>
-      <div>{{ words_title }}</div>
-      <div>{{ keywords_gather }}</div>
+      <!-- <div>{{ words_title }}</div>
+      <div>{{ keywords_gather }}</div> -->
+      <div>{{ category }}</div>
     </div>
     <!-- 标签 -->
   </div>
@@ -36,64 +37,7 @@ export default {
             category: [], // 类目信息
             source: '化核加应子一箱24公斤湿乌梅子蜜饯果脯凉果散装批发潮汕特产',
             words_title: '', // 存放点击时的标签值
-            value: [{
-                t: '散装',
-                p: 1
-            }, {
-                't': '凉果',
-                'p': 0.949666
-            }, {
-                't': '化核',
-                'p': 0.945319
-            }, {
-                't': '潮汕特产',
-                'p': 0.944873
-            }, {
-                't': '批发',
-                'p': 0.941044
-            }, {
-                't': '蜜饯果脯',
-                'p': 0.900627
-            }, {
-                't': '加应子',
-                'p': 0.87609
-            }, {
-                't': '梅子',
-                'p': 0.864396
-            }, {
-                't': '公斤',
-                'p': 0.802228
-            }, {
-                't': '子一',
-                'p': 0.73246
-            }, {
-                't': '特产',
-                'p': 0.61853
-            }, {
-                't': '潮汕',
-                'p': 0.557646
-            }, {
-                't': '乌梅',
-                'p': 0.543547
-            }, {
-                't': '一箱',
-                'p': 0.473186
-            }, {
-                't': '果脯',
-                'p': 0.463706
-            }, {
-                't': '24公斤',
-                'p': 0.443
-            }, {
-                't': '24',
-                'p': 0.382406
-            }, {
-                't': '蜜饯',
-                'p': 0.341272
-            }, {
-                't': '发潮',
-                'p': 0.0731135
-            }] // { "t": "化核", "p": "0.945319" }, { "t": "加应子", "p": "0.87609" },
+            value: [] // { "t": "化核", "p": "0.945319" }, { "t": "加应子", "p": "0.87609" },
         }
     },
     created() {
@@ -103,7 +47,7 @@ export default {
             method: 'get',
             url: 'http://120.77.183.17:8888/get/offer/keyword/',
             params: {
-                'csrf_token': '1575266541673',
+                'csrf_token': '1575283943246',
                 'cookie2': '175203fa7876f0e9213abb3cfaa83e47',
                 'campaignId': '817274318',
                 'adGroupIdList': '394115593'
@@ -123,7 +67,7 @@ export default {
                 method: 'post',
                 url: 'http://120.77.183.17:8888/post/offer/keyword/cpc/',
                 data: {
-                    csrf_token: '1575266541673',
+                    csrf_token: '1575283943246',
                     cookie2: '175203fa7876f0e9213abb3cfaa83e47',
                     keywords: this.key_all
                 }
@@ -143,6 +87,9 @@ export default {
                         searchAvg7days: cpc_selected['searchAvg7days']
                     })
                 }
+                this.key_words()
+                // 上传数据
+                // this.upload_data()
             }).catch(err => {
                 console.log(err.response)
                 alert('获取cpc失败')
@@ -156,7 +103,7 @@ export default {
             method: 'get',
             url: 'http://120.77.183.17:8888/get/campaign/adgroup/info/',
             params: {
-                csrf_token: '1575266541673',
+                csrf_token: '1575283943246',
                 cookie2: '175203fa7876f0e9213abb3cfaa83e47',
                 'adGroupIds': '394115593' // 推广单元id
             }
@@ -167,22 +114,45 @@ export default {
                 return [item.category, item.title]
             })
             // alert('ok')
+            // this.key_words()
         }).catch(err => {
             console.log(err.response)
             alert('整合类目&标题信息失败')
         })
+        // 进行分词
+        this.get()
+        // 合并关键词
+        // this.key_words()
+        // 上传数据
+        // this.upload_data()
     },
     methods: {
         // 获取分词标签
         get_title(value) {
             console.log(value)
-            this.words_title = value
+            this.words_title = value // 点击获取分词
+            // this.category[0]// 类目信息
+            this.$axios({
+                method: 'get',
+                url: 'http://120.77.183.17:8888/get/analyizer/result/',
+                params: {
+                    word: this.words_title,
+                    category: this.category[0][0],
+                    csrf_token: '1575283943246',
+                    cookie2: '175203fa7876f0e9213abb3cfaa83e47'
+                }}).then(res => {
+                  this.zzz = res
+                console.log(res)
+                alert('登陆成功')
+            }).catch( () => {
+                alert('登陆失败')
+            })
         },
         // 进行分词
         get() {
             this.$axios({
                 method: 'get',
-                url: 'http://120.77.183.17/analyizer',
+                url: '/analyizer/get.php',
                 params: {
                     source: this.source,
                     param1: 0,
@@ -197,7 +167,8 @@ export default {
                     b.p = parseFloat(b.p)
                     return b.p - a.p
                 })
-                this.value = res
+                console.log(res.data)
+                this.value = res.data
                 // this.cities = this.value.t
             })
             this.key_words()
@@ -212,13 +183,7 @@ export default {
             // console.log(this.key_all_index)
             for (let x of this.key_all_index) {
                 for (let y of this.key_cpc_all) {
-                // console.log(y)
-                // alert('aa')
                     if (x.keyword === y.keyword) {
-                    // if ( y.countBuyer > 0 ) 是否筛选
-                    // this.yy = y.gmtCreate
-                    // 转成data格式，然后拼接日期 "Wed Nov 27 10:15:32 CST 2019"
-                    // console.log(y.gmtCreate)
                         var zero = y.gmtCreate.split(' ')[3] // 提取 10：15：32
                         var day = y.gmtCreate.split(' ')[2] // 提取 27
                         var datas = y.gmtCreate.replace(zero, '') // 将 10：15：32删除,使.getData()获取日期正常
@@ -251,6 +216,7 @@ export default {
                 }
             }).then(res => {
                 console.log(res)
+                console.log('上传成功')
             })
             console.log(this.keywords_gather)
         }
