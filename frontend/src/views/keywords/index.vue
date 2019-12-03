@@ -1,9 +1,6 @@
 <template>
   <div>
     <div>
-      分词页面
-      <!-- <input v-model="source" placeholder="化核加应子一箱24公斤湿乌梅子蜜饯果脯凉果散装批发潮汕特产">
-      <button @click="get">提交</button> -->
       <div class="inline">
         <ul>
           <el-button
@@ -16,12 +13,7 @@
           >{{ title.t }}</el-button>
         </ul>
       </div>
-      <!-- <div>{{ words_title }}</div> -->
-      <!-- <div>{{ keywords_gather }}</div> -->
-      <!-- <div>{{ zzz }}</div> -->
-      <!-- <div>{{ value }}</div> -->
     </div>
-    <!-- 标签 -->
   </div>
 </template>
 
@@ -54,15 +46,12 @@ export default {
                 'adGroupIdList': '394115593'
             }
         }).then(res => {
-            // this.key_all = res.data.data.recommendKeywordVOList
             // 遍历数组，并获取keywod,recommendTags值
             for (let v of Object.values(res.data.data.recommendKeywordVOList)) {
                 this.key_all.push(v.keyword)
                 this.key_all_index.push({ keyword: v['keyword'], recommendTags: v['recommendTags'] })
             }
             this.key_all = this.key_all.join(',')
-            // console.log(this.key_all_index)
-            // alert('登陆成功')
             // 获取cpc 所有关键词
             this.$axios({
                 method: 'post',
@@ -74,10 +63,7 @@ export default {
                 }
             }).then(res => {
                 for (let cpc_selected of Object.values(res.data.data.listVOREST)) {
-                // this.key_all.push(v.keyword)
-                // let cpc_selected = res.data.data.listVOREST
                     this.key_cpc = cpc_selected
-                    // console.log(cpc_selected)
                     // 提取关键的键值放入key_cpc_all 数组
                     this.key_cpc_all.push({
                         gmtCreate: cpc_selected['gmtCreate'],
@@ -89,8 +75,6 @@ export default {
                     })
                 }
                 this.key_words()
-                // console.log(this.category[0][1])
-                // this.source = this.category[0][1]
             }).catch(err => {
                 console.log(err.response)
                 alert('获取cpc失败')
@@ -109,25 +93,16 @@ export default {
                 'adGroupIds': '394115593' // 推广单元id
             }
         }).then(res => {
-            // this.category= res
             this.category = res.data.data.adGroupVOList
             this.category = this.category.map(item => {
                 return [item.category, item.title]
             })
-            // alert('ok')
-            // this.key_words()
             // 进行分词
             this.get()
         }).catch(err => {
             console.log(err.response)
             alert('整合类目&标题信息失败')
         })
-        // 进行分词
-        // this.get()
-        // 合并关键词
-        // this.key_words()
-        // 上传数据
-        // this.upload_data()
     },
     methods: {
         // 获取分词标签
@@ -144,21 +119,15 @@ export default {
                     csrf_token: '1575283943246',
                     cookie2: '175203fa7876f0e9213abb3cfaa83e47'
                 }}).then(res => {
-                // this.zzz = res
                 console.log(res)
-                alert('登陆成功')
             }).catch(() => {
                 alert('登陆失败')
             })
         },
         // 进行分词
         get() {
-            // let cate_title = this.category
-            // this.source = this.category[0][1]
-            // console.log('zzzz')
             console.log(this.category[0][1])
             let sources = this.category[0][1]
-            // console.log(this.category)
             this.$axios({
                 method: 'get',
                 url: '/analyizer/get.php',
@@ -169,27 +138,18 @@ export default {
                     json: 1
                 }}).then(res => {
                 console.log(res)
-                alert('登陆成功')
                 // 将获取的分词通过p 参数的大小进行反向排序
                 res.data.sort(function(a, b) {
                     a.p = parseFloat(a.p)
                     b.p = parseFloat(b.p)
                     return b.p - a.p
                 })
-                console.log(res.data)
                 this.value = res.data
-                // this.cities = this.value.t
             })
             this.key_words()
         },
         // 合并关键词
         key_words() {
-            console.log(111)
-            console.log(this.key_all_index)
-            console.log(this.key_cpc_all)
-            // console.log(222)
-            // this.get_all_cpc_words()
-            // console.log(this.key_all_index)
             for (let x of this.key_all_index) {
                 for (let y of this.key_cpc_all) {
                     if (x.keyword === y.keyword) {
