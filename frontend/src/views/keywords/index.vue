@@ -144,11 +144,19 @@
 
       </el-row>
     </div>
+    <!-- 提交 -->
+    <div class="buttsuee">
+      <el-row :gutter="20">
+        <el-col :span="3" :offset="19">
+          <el-button type="primary" @click="clickKeyword">确定</el-button>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
 <script>
-import { analyizerResult } from '@/api/keyword' // api
+import { analyizerResult, offerkeyword } from '@/api/keyword' // api
 import keywordShow from '@/components/Getallplan/keywordShow.vue' // 分页组件
 export default {
     // 组件
@@ -174,6 +182,8 @@ export default {
             selsectAll: null, // 选中的row
             pc: 'pc',
             pv: 'pv',
+            campaignId: null, // 推广计划id
+            adGroupIdList: null, // 推广单元id
             // 太有
             key_all: [], // 所有关键词
             key_cpc: [], // cpc单个关键词
@@ -189,6 +199,11 @@ export default {
         }
     },
     created() {
+        // 获取id
+        const campaignId = this.$route.query.campaignId
+        const adGroupIdList = this.$route.query.adGroupIdList
+        this.campaignId = campaignId
+        this.adGroupIdList = adGroupIdList
         // 获取所有关键词 & 获取所有cpc关键词
         this.$axios({
             method: 'get',
@@ -196,8 +211,9 @@ export default {
             params: {
                 'csrf_token': '1575283943246',
                 'cookie2': '175203fa7876f0e9213abb3cfaa83e47',
-                'campaignId': '817274318',
-                'adGroupIdList': '394115593'
+                campaignId: this.campaignId,
+
+                adGroupIdList: this.adGroupIdList
             }
         }).then(res => {
             // 遍历数组，并获取keywod,recommendTags值
@@ -244,7 +260,7 @@ export default {
             params: {
                 csrf_token: '1575283943246',
                 cookie2: '175203fa7876f0e9213abb3cfaa83e47',
-                'adGroupIds': '394115593' // 推广单元id
+                'adGroupIds': this.adGroupIdList // 推广单元id
             }
         }).then(res => {
             this.category = res.data.data.adGroupVOList
@@ -346,7 +362,6 @@ export default {
         },
         // 点击多选框
         clickRow(row) {
-            console.log(row)
             let rowData = row
             let arrKey = []
             for (let i = 0; i < rowData.length; i++) {
@@ -373,6 +388,31 @@ export default {
         // 子方法修改pc
         updataPc(row, data) {
             console.log('rows', row, data)
+        },
+        // 提交关键词
+        clickKeyword() {
+            let keywords = []
+            let bidPrices = []
+            let keydata = this.keyword
+            let json = {}
+            for (let i = 0; i < keydata.length; i++) {
+                console.log(keydata[i])
+                keywords.push(keydata[i].keyword)
+                bidPrices.push(parseFloat(keydata[i].pc).toFixed(1) + '_' + parseFloat(keydata[i].pv).toFixed(1))
+            }
+            keywords = keywords.join('@@@')
+            bidPrices = bidPrices.join(',')
+            json['campaignId'] = this.campaignId
+            json['adGroupIdList'] = this.adGroupIdList
+            json['keywords'] = keywords
+            json['bidPrices'] = bidPrices
+            offerkeyword(json).then(res => {
+                console.log(res)
+                // 跳转到推广计划下所有推广单元
+                this.$router.push({ path: '/getallplan/addgoods', query: { id: this.campaignId }})
+            }).catch(err => {
+                console.log(err)
+            })
         }
 
     }
@@ -387,5 +427,8 @@ export default {
   .inline ul li {
     display: inline-block;
     width: 11%;
+  }
+  .buttsuee{
+      margin-top: 20px
   }
 </style>

@@ -8,3 +8,13 @@ export function analyizerResult(params) {
         params
     })
 }
+
+// 添加关键词
+
+export function offerkeyword(data) {
+    return request({
+        url: '/post/offer/keyword/',
+        method: 'post',
+        data
+    })
+}
