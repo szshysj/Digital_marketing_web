@@ -328,9 +328,11 @@ export default {
         // 跳转推广单元商品
         goodsPlan(val) {
             const title = val.title
+            const campaignId = this.$route.query.id
+            const adGroupIdList = val.id
             // console.log(goodsId, '我是推广单元商品跳转')
-            // console.log(val)
-            this.$router.push({ path: '/getallplan/keywords', query: { title: title }})
+
+            this.$router.push({ path: '/getallplan/keywords', query: { title, campaignId, adGroupIdList }})
         }
     }
 }
