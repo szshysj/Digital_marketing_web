@@ -62,11 +62,11 @@ module.exports = {
             //     }
             // },
             // 第三方分词
-            '/analyizer': { // 使用"/api"来代替"http://f.apiplus.c"
-                target: 'http://api.pullword.com', // 源地址
+            '/api': { // 使用"/api"来代替"http://f.apiplus.c"
+                target: 'http://120.77.183.17:80/', // 源地址
                 changeOrigin: true, // 改变源
                 pathRewrite: {
-                    '^/analyizer': 'http://api.pullword.com' // 路径重写
+                    '^/api': 'http://120.77.183.17:80/' // 路径重写
                 }
             }
         }
