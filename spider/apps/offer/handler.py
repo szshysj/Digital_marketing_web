@@ -21,7 +21,7 @@ class GetOfferHandler(BaseHandler):
         try:
             data = loads(resp)
         except ValueError:
-            self.set_status(404)
+            self.set_status(401)
             return await self.finish({'msg': '状态失效, 需要重新登录'})
 
         await self.finish(data)

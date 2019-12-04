@@ -27,7 +27,7 @@ class GetAnalyizerResultByWordHandler(BaseHandler):
         try:
             data = loads(text)
         except ValueError:
-            self.set_status(404)
+            self.set_status(401)
             return await self.finish({'msg': '状态失效, 需要重新登录'})
 
         await self.finish(data)
@@ -115,7 +115,7 @@ class GetAdgroupKeywordListHandler(BaseHandler):
         try:
             data = loads(text)
         except ValueError:
-            self.set_status(404)
+            self.set_status(401)
             return await self.finish({'msg': '状态失效, 需要重新登录'})
 
         await self.finish(data)
@@ -135,7 +135,7 @@ class AddOfferKeywordHandler(BaseHandler):
         try:
             data = loads(text)
         except ValueError:
-            self.set_status(404)
+            self.set_status(401)
             return await self.finish({'msg': '状态失效, 需要重新登录'})
 
         await self.finish(data)
@@ -155,7 +155,7 @@ class GetOfferKeywordCpcHandler(BaseHandler):
         try:
             data = loads(text)
         except ValueError:
-            self.set_status(404)
+            self.set_status(401)
             return await self.finish({'msg': '状态失效, 需要重新登录'})
 
         await self.finish(data)
@@ -176,7 +176,7 @@ class GetOfferKeywordHandler(BaseHandler):
         try:
             data = loads(text)
         except ValueError:
-            self.set_status(404)
+            self.set_status(401)
             return await self.finish({'msg': '状态失效, 需要重新登录'})
 
         await self.finish(data)
