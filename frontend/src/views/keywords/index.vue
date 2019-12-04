@@ -8,6 +8,7 @@
           size="small"
           :index="index"
           :content="title"
+          :class="{ 'btnshow': title.t === btnshow }"
           @click="butanalyizer(title.t)"
         >{{ title.t }}</el-button>
       </ul>
@@ -184,6 +185,7 @@ export default {
             pv: 'pv',
             campaignId: null, // 推广计划id
             adGroupIdList: null, // 推广单元id
+            btnshow: '', // 按钮样式
             // 太有
             key_all: [], // 所有关键词
             key_cpc: [], // cpc单个关键词
@@ -344,6 +346,7 @@ export default {
         // 分割线----------------------------------------------------------------------
         // 分词按钮
         butanalyizer(value) {
+            this.btnshow = value
             this.listLoading = true
             let json = {}
             json['word'] = value
@@ -430,5 +433,8 @@ export default {
   }
   .buttsuee{
       margin-top: 20px
+  }
+  .btnshow{
+      background: #ecf5ff;
   }
 </style>
