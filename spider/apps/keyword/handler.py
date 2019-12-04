@@ -41,32 +41,17 @@ class AddKeywordToMysqlHandler(BaseHandler):
         # 遍历每一条数据
         for data in param['keyword_list']:
 
-            # 无论怎样, 都将数据保存到 '历史' 库
-            async with self.application.objects.atomic():
-                await self.application.objects.create(Offer_Keyword_7days,
-                                                      keyword=data[0],
-                                                      recommendTags=data[1],
-                                                      countBuyer=data[2],
-                                                      leftAvgClick7days=round(data[3], 2),
-                                                      leftAvgPV7days=round(data[4], 2),
-                                                      searchAvg7days=data[5],
-                                                      category=data[-2],
-                                                      update_time=data[-1])
-
             # 能查到数据
             try:
                 sql_data = await self.application.objects.get(
                     Offer_Keyword.select(Offer_Keyword.keyword,
-                                         Offer_Keyword.keyword_update_time,
-                                         Offer_Keyword.category
-                                         ).where(
-                        (Offer_Keyword.keyword == data[0]) & (Offer_Keyword.category == data[-2])
-                    ))
+                                         Offer_Keyword.keyword_update_time
+                                         ).where(Offer_Keyword.keyword == data[0]))
                 # 将结果dict化
                 sql_data = model_to_dict(sql_data)
 
                 # 如果数据是当天, 则不用更新数据, 跳过
-                if data[-2] == sql_data['category'] and data[-1] == str(sql_data['keyword_update_time']):
+                if data[-1] == str(sql_data['keyword_update_time']):
                     continue
 
                 # 开启事务, update数据, 失败自动rollback
@@ -79,8 +64,7 @@ class AddKeywordToMysqlHandler(BaseHandler):
                             leftAvgPV7days=round(data[4], 2),
                             searchAvg7days=data[5],
                             keyword_update_time=data[-1]
-                        ).where((Offer_Keyword.keyword == data[0]) & (Offer_Keyword.category == data[-2]))
-                    )
+                        ).where(Offer_Keyword.keyword == data[0]))
 
             # 找不到数据, 做insert操作
             except Offer_Keyword.DoesNotExist:
@@ -93,8 +77,18 @@ class AddKeywordToMysqlHandler(BaseHandler):
                                                           leftAvgClick7days=round(data[3], 2),
                                                           leftAvgPV7days=round(data[4], 2),
                                                           searchAvg7days=data[5],
-                                                          category=data[-2],
                                                           keyword_update_time=data[-1])
+
+            # 无论怎样, 都将数据保存到 '历史' 库
+            async with self.application.objects.atomic():
+                await self.application.objects.create(Offer_Keyword_7days,
+                                                      keyword=data[0],
+                                                      recommendTags=data[1],
+                                                      countBuyer=data[2],
+                                                      leftAvgClick7days=round(data[3], 2),
+                                                      leftAvgPV7days=round(data[4], 2),
+                                                      searchAvg7days=data[5],
+                                                      update_time=data[-1])
 
         await self.finish('finish')
 

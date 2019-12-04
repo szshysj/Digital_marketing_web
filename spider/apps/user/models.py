@@ -1,5 +1,4 @@
 from Digital_marketing.models import BaseModel
-from datetime import datetime
 
 from peewee import FixedCharField, DateTimeField, CharField, SmallIntegerField, FloatField, PrimaryKeyField
 
@@ -11,7 +10,6 @@ class Offer_Keyword_7days(BaseModel):
     leftAvgClick7days = FloatField(null=False, verbose_name='点击率')
     leftAvgPV7days = FloatField(null=False, verbose_name='平均出价')
     searchAvg7days = SmallIntegerField(null=False, verbose_name='展示指数')
-    category = CharField(null=False, max_length=10, verbose_name='产品类目')
     update_time = DateTimeField(null=False, verbose_name='更新时间')
     # is_delete          tinyint(1) 0 未删除  1 逻辑删除
 
@@ -25,7 +23,6 @@ class Offer_Keyword(BaseModel):
     leftAvgPV7days = FloatField(null=False, verbose_name='平均出价')
     searchAvg7days = SmallIntegerField(null=False, verbose_name='展示指数')
     keyword_update_time = DateTimeField(null=False, verbose_name='官方关键词更新时间')
-    category = CharField(null=False, max_length=10, verbose_name='产品类目')
     # update_time        TimestampField
     # is_delete          tinyint(1) 0 未删除  1 逻辑删除
 
