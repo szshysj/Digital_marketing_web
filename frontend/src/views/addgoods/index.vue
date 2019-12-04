@@ -16,7 +16,7 @@
         搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        添加
+        添加单元
       </el-button>
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
@@ -275,12 +275,18 @@ export default {
             this.getList()
         },
         // add
-        handleCreate() {
-            console.log('我是添加')
-            this.$message({
-                message: '我是添加',
-                type: 'success'
-            })
+        handleCreate(val) {
+            // console.log('我是添加')
+            // this.$message({
+            //     message: '我是添加',
+            //     type: 'success'
+            // })
+            let id = this.$route.query.id
+            let params = {}
+            params['campaignId'] = id
+            const title = val.title
+            // 将推广计划IP传入添加单元页面
+            this.$router.push({ path: '/getallplan/addcell', query: { id: params.campaignId, title: title }})
         },
         // 下载exle文件
         handleDownload() {
