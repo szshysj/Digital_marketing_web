@@ -33,7 +33,7 @@
             v-loading="listLoading"
             :data="tableData"
             style="width: 100%"
-            :default-sort="{prop: 'date', order: 'descending'}"
+            :default-sort="{prop: '_source.leftavgclick7days', order: 'descending'}"
             :header-cell-style="{background:'#F5F7FA'}"
             @selection-change="clickRow"
           >
@@ -236,10 +236,10 @@ export default {
                 }
                 this.key_words()
                 this.upload_data()
-            }).catch(err => {
+            }).catch(() => {
                 alert('获取cpc失败')
             })
-        }).catch(err => {
+        }).catch(() => {
             alert('获取所有关键词失败')
         })
         // 获取类目信息
@@ -252,7 +252,7 @@ export default {
             })
             // 进行分词
             this.get()
-        }).catch(err => {
+        }).catch(() => {
             alert('整合类目&标题信息失败')
         })
     },
