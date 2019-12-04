@@ -273,16 +273,20 @@ export default {
                                 message: '恭喜你，提交成功',
                                 type: 'success'
                             })
-                            this.$confirm('是否保留当前数据？', '提示', {
-                                confirmButtonText: '确定',
-                                cancelButtonText: '取消',
-                                type: 'warning'
-                            }).then(_ => {
-                                this.form.name = this.formatDates()
-                            }).catch(_ => {
-                                // 小问题性能缓存
-                                this.$router.go(0)
-                            })
+
+                            // 刷新当前页面
+                            this.$router.go(0)
+
+                            // this.$confirm('是否保留当前数据？', '提示', {
+                            //     confirmButtonText: '确定',
+                            //     cancelButtonText: '取消',
+                            //     type: 'warning'
+                            // }).then(_ => {
+                            //     this.form.name = this.formatDates()
+                            // }).catch(_ => {
+                            //     // 小问题性能缓存
+                            //
+                            // })
                         }).catch(err => {
                             console.log(err)
                             this.$message.error('错误！！！')
