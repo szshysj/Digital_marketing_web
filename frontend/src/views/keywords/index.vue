@@ -193,7 +193,7 @@ export default {
             key_cpc_all: [], // cpc 所有关键词
             keywords_gather: [], // 整合后的数据
             month: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], // 进行月份枚举
-            category: [], // 类目信息&标题
+            category: [], // 类目信息
             source: '获取标题信息',
             words_title: '', // 存放点击时的标签值
             value: [] // { "t": "化核", "p": "0.945319" }, { "t": "加应子", "p": "0.87609" },
@@ -303,7 +303,7 @@ export default {
                             parseFloat(y.leftAvgClick7days.toFixed(2)),
                             parseFloat(y.leftAvgPV7days.toFixed(2)),
                             y.searchAvg7days,
-                            // this.category[0][0], // 类目信息
+                            this.category[0][0], // 类目信息
                             y.gmtCreate
                         ]
                         )
