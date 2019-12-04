@@ -157,7 +157,7 @@
 </template>
 
 <script>
-import { analyizerResult, offerkeyword } from '@/api/keyword' // api
+import { analyizerResult, offerkeyword, getAllKeyword, getCpckeyword, getAdgropInfo, updata } from '@/api/keyword' // api
 import keywordShow from '@/components/Getallplan/keywordShow.vue' // 分页组件
 export default {
     // 组件
@@ -206,18 +206,12 @@ export default {
         const adGroupIdList = this.$route.query.adGroupIdList
         this.campaignId = campaignId
         this.adGroupIdList = adGroupIdList
-        // 获取所有关键词 & 获取所有cpc关键词
-        this.$axios({
-            method: 'get',
-            url: 'http://120.77.183.17:8888/get/offer/keyword/',
-            params: {
-                'csrf_token': '1575283943246',
-                'cookie2': '175203fa7876f0e9213abb3cfaa83e47',
-                campaignId: this.campaignId,
+        let allwords = {}
+        allwords['campaignId'] = this.campaignId
+        allwords['adGroupIdList'] = this.adGroupIdList
 
-                adGroupIdList: this.adGroupIdList
-            }
-        }).then(res => {
+        // 获取所有关键词 & 获取所有cpc关键词
+        getAllKeyword(allwords).then(res => {
             // 遍历数组，并获取keywod,recommendTags值
             for (let v of Object.values(res.data.data.recommendKeywordVOList)) {
                 this.key_all.push(v.keyword)
@@ -225,15 +219,9 @@ export default {
             }
             this.key_all = this.key_all.join(',')
             // 获取cpc 所有关键词
-            this.$axios({
-                method: 'post',
-                url: 'http://120.77.183.17:8888/post/offer/keyword/cpc/',
-                data: {
-                    csrf_token: '1575283943246',
-                    cookie2: '175203fa7876f0e9213abb3cfaa83e47',
-                    keywords: this.key_all
-                }
-            }).then(res => {
+            let cpckeywords = {}
+            cpckeywords['keywords'] = this.key_all
+            getCpckeyword(cpckeywords).then(res => {
                 for (let cpc_selected of Object.values(res.data.data.listVOREST)) {
                     this.key_cpc = cpc_selected
                     // 提取关键的键值放入key_cpc_all 数组
@@ -247,6 +235,7 @@ export default {
                     })
                 }
                 this.key_words()
+                this.upload_data()
             }).catch(err => {
                 console.log(err.response)
                 alert('获取cpc失败')
@@ -256,15 +245,9 @@ export default {
             alert('获取所有关键词失败')
         })
         // 获取类目信息
-        this.$axios({
-            method: 'get',
-            url: 'http://120.77.183.17:8888/get/campaign/adgroup/info/',
-            params: {
-                csrf_token: '1575283943246',
-                cookie2: '175203fa7876f0e9213abb3cfaa83e47',
-                'adGroupIds': this.adGroupIdList // 推广单元id
-            }
-        }).then(res => {
+        let info = {}
+        info['adGroupIds'] = this.adGroupIdList
+        getAdgropInfo(info).then(res => {
             this.category = res.data.data.adGroupVOList
             this.category = this.category.map(item => {
                 return [item.category, item.title]
@@ -300,7 +283,7 @@ export default {
                 })
                 this.value = res.data
             })
-            this.key_words()
+            // this.key_words()
         },
         // 合并关键词
         key_words() {
@@ -328,24 +311,24 @@ export default {
                     }
                 }
             }
+            console.log(this.keywords_gather)
         },
         // 上传关键词
         upload_data() {
-            this.$axios({
-                method: 'post',
-                url: 'http://120.77.183.17:8888/post/mysql/keyword/',
-                data: {
-                    keyword_list: this.keywords_gather
-                }
-            }).then(res => {
+            let datas = {}
+            datas['keyword_list'] = this.keywords_gather
+            updata(datas).then(res => {
                 console.log(res)
                 console.log('上传成功')
+            }).catch(() => {
+                console.log('上传失败')
             })
             console.log(this.keywords_gather)
         },
         // 分割线----------------------------------------------------------------------
         // 分词按钮
         butanalyizer(value) {
+            console.log(this)
             this.btnshow = value
             this.listLoading = true
             let json = {}
@@ -434,6 +417,7 @@ export default {
   .buttsuee{
       margin-top: 20px
   }
+  // 点按钮样式
   .btnshow{
       background: #ecf5ff;
   }
