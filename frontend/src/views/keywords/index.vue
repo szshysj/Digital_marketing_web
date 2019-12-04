@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app-container">
     <div class="inline">
       <ul>
         <el-button
@@ -383,6 +383,23 @@ export default {
             json['keywords'] = keywords
             json['bidPrices'] = bidPrices
             offerkeyword(json).then(res => {
+                const textErr = res.data.data.ErrorKeywordList
+                let errText = []
+                if (textErr.length != 0) {
+                    for (var i = 0; i < textErr.length; i++) {
+                        errText.push(textErr[i].keyword + '=>' + textErr[i].keywordAddErrorReason)
+                    }
+                    errText = errText.join('<br>')
+                    this.$message.error({
+                        dangerouslyUseHTMLString: true,
+                        message: `<strong>${errText}</strong>`
+                    })
+                } else {
+                    this.$message.success({
+                        message: '成功'
+                    })
+                }
+
                 // 跳转到推广计划下所有推广单元
                 this.$router.push({ path: '/getallplan/addgoods', query: { id: this.campaignId }})
             }).catch(err => {
