@@ -237,11 +237,9 @@ export default {
                 this.key_words()
                 this.upload_data()
             }).catch(err => {
-                console.log(err.response)
                 alert('获取cpc失败')
             })
         }).catch(err => {
-            console.log(err.response)
             alert('获取所有关键词失败')
         })
         // 获取类目信息
@@ -255,7 +253,6 @@ export default {
             // 进行分词
             this.get()
         }).catch(err => {
-            console.log(err.response)
             alert('整合类目&标题信息失败')
         })
     },
@@ -263,7 +260,6 @@ export default {
 
         // 进行分词
         get() {
-            console.log(this.category[0][1])
             let sources = this.category[0][1]
             this.$axios({
                 method: 'get',
@@ -274,7 +270,6 @@ export default {
                     param2: 1,
                     json: 1
                 }}).then(res => {
-                console.log(res)
                 // 将获取的分词通过p 参数的大小进行反向排序
                 res.data.sort(function(a, b) {
                     a.p = parseFloat(a.p)
@@ -311,24 +306,20 @@ export default {
                     }
                 }
             }
-            console.log(this.keywords_gather)
         },
         // 上传关键词
         upload_data() {
             let datas = {}
             datas['keyword_list'] = this.keywords_gather
             updata(datas).then(res => {
-                console.log(res)
                 console.log('上传成功')
             }).catch(() => {
                 console.log('上传失败')
             })
-            console.log(this.keywords_gather)
         },
         // 分割线----------------------------------------------------------------------
         // 分词按钮
         butanalyizer(value) {
-            console.log(this)
             this.btnshow = value
             this.listLoading = true
             let json = {}
@@ -382,7 +373,6 @@ export default {
             let keydata = this.keyword
             let json = {}
             for (let i = 0; i < keydata.length; i++) {
-                console.log(keydata[i])
                 keywords.push(keydata[i].keyword)
                 bidPrices.push(parseFloat(keydata[i].pc).toFixed(1) + '_' + parseFloat(keydata[i].pv).toFixed(1))
             }
@@ -393,7 +383,6 @@ export default {
             json['keywords'] = keywords
             json['bidPrices'] = bidPrices
             offerkeyword(json).then(res => {
-                console.log(res)
                 // 跳转到推广计划下所有推广单元
                 this.$router.push({ path: '/getallplan/addgoods', query: { id: this.campaignId }})
             }).catch(err => {
