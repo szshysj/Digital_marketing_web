@@ -3,14 +3,14 @@
     <div class="inline">
       <ul>
         <el-button
-          v-for="(title, index) in value"
+          v-for="(title, index) in part_titile"
           :key="index"
           size="small"
           :index="index"
           :content="title"
-          :class="{ 'btnshow': title.t === btnshow }"
-          @click="butanalyizer(title.t)"
-        >{{ title.t }}</el-button>
+          :class="{ 'btnshow': title === btnshow }"
+          @click="butanalyizer(title)"
+        >{{ title }}</el-button>
       </ul>
     </div>
     <!-- 分词数据渲染 -->
@@ -194,8 +194,8 @@ export default {
             category: [], // 类目信息
             source: '获取标题信息',
             words_title: '', // 存放点击时的标签值
-            value: [] // { "t": "化核", "p": "0.945319" }, { "t": "加应子", "p": "0.87609" },
-
+            value: [], // { "t": "化核", "p": "0.945319" }, { "t": "加应子", "p": "0.87609" },
+            part_titile: [] // 去重后分词标题['奶糖'，'糖果']
         }
     },
     created() {
@@ -275,6 +275,11 @@ export default {
                     return b.p - a.p
                 })
                 this.value = res.data
+                // 分词去重
+                this.part_titile = this.value.map(list => {
+                    return list.t
+                })
+                this.part_titile = [...new Set(this.part_titile)]
             })
             // this.key_words()
         },
