@@ -1,15 +1,16 @@
 <template>
-  <div>
+  <div class="app-container">
     <div class="inline">
       <ul>
         <el-button
-          v-for="(title, index) in value"
+          v-for="(title, index) in part_titile"
           :key="index"
           size="small"
           :index="index"
           :content="title"
-          @click="butanalyizer(title.t)"
-        >{{ title.t }}</el-button>
+          :class="{ 'btnshow': title === btnshow }"
+          @click="butanalyizer(title)"
+        >{{ title }}</el-button>
       </ul>
     </div>
     <!-- 分词数据渲染 -->
@@ -17,14 +18,13 @@
       <el-row :gutter="20">
         <!-- 左边 -->
         <el-col :span="12">
-          <div class="btnTop" style="visibility: hidden;">
+
+          <div class="btnTop">
             <el-row>
               <el-col :span="12">
-                <p>已添加12个关键词</p>
+                <p>点击率为排序</p>
               </el-col>
-              <el-col :span="12">
-                <el-button type="warning">批量删除</el-button>
-              </el-col>
+
             </el-row>
           </div>
           <el-table
@@ -32,7 +32,7 @@
             v-loading="listLoading"
             :data="tableData"
             style="width: 100%"
-            :default-sort="{prop: 'date', order: 'descending'}"
+            :default-sort="{prop: '_source.leftavgclick7days', order: 'descending'}"
             :header-cell-style="{background:'#F5F7FA'}"
             @selection-change="clickRow"
           >
@@ -90,12 +90,12 @@
         <!-- 右边 -->
         <el-col :span="12">
           <div class="btnTop">
-            <el-row>
-              <el-col :span="12">
+            <el-row :gutter="24">
+              <el-col :span="18">
                 <p>已添加{{ this.keyword.length }}个关键词</p>
               </el-col>
-              <el-col :span="12">
-                <el-button type="warning" @click="handleModifyStatus()">批量删除</el-button>
+              <el-col :span="2" :offset="2">
+                <el-button type="warning" class="btuncolor" @click="handleModifyStatus()">批量删除</el-button>
               </el-col>
             </el-row>
           </div>
@@ -113,13 +113,13 @@
               width="120"
             />
 
-            <el-table-column align="center" label="PC端出价" width="280" prop="pc">
+            <el-table-column align="center" label="PC端出价" min-width="250" prop="pc">
               <template slot-scope="{row}">
                 <keywordShow :row="row" :offpc="pc" />
               </template>
             </el-table-column>
 
-            <el-table-column align="center" label="移动端出价" width="280" prop="pv">
+            <el-table-column align="center" label="移动端出价" min-width="250" prop="pv">
               <template slot-scope="{row}">
                 <keywordShow :row="row" :offpc="pv" />
               </template>
@@ -129,7 +129,7 @@
             <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width" type="index">
               <template slot-scope="{row,$index}">
                 <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,$index)">
-                  删除{{ $index }}
+                  删除
                 </el-button>
               </template>
             </el-table-column>
@@ -146,17 +146,15 @@
     </div>
     <!-- 提交 -->
     <div class="buttsuee">
-      <el-row :gutter="20">
-        <el-col :span="3" :offset="19">
-          <el-button type="primary" @click="clickKeyword">确定</el-button>
-        </el-col>
-      </el-row>
+
+      <span class="btuncolor btnpadd" @click="clickKeyword">保存并继续</span>
+
     </div>
   </div>
 </template>
 
 <script>
-import { analyizerResult, offerkeyword } from '@/api/keyword' // api
+import { analyizerResult, offerkeyword, getAllKeyword, getCpckeyword, getAdgropInfo, updata } from '@/api/keyword' // api
 import keywordShow from '@/components/Getallplan/keywordShow.vue' // 分页组件
 export default {
     // 组件
@@ -184,6 +182,7 @@ export default {
             pv: 'pv',
             campaignId: null, // 推广计划id
             adGroupIdList: null, // 推广单元id
+            btnshow: '', // 按钮样式
             // 太有
             key_all: [], // 所有关键词
             key_cpc: [], // cpc单个关键词
@@ -194,8 +193,8 @@ export default {
             category: [], // 类目信息
             source: '获取标题信息',
             words_title: '', // 存放点击时的标签值
-            value: [] // { "t": "化核", "p": "0.945319" }, { "t": "加应子", "p": "0.87609" },
-
+            value: [], // { "t": "化核", "p": "0.945319" }, { "t": "加应子", "p": "0.87609" },
+            part_titile: [] // 去重后分词标题['奶糖'，'糖果']
         }
     },
     created() {
@@ -204,18 +203,12 @@ export default {
         const adGroupIdList = this.$route.query.adGroupIdList
         this.campaignId = campaignId
         this.adGroupIdList = adGroupIdList
-        // 获取所有关键词 & 获取所有cpc关键词
-        this.$axios({
-            method: 'get',
-            url: 'http://120.77.183.17:8888/get/offer/keyword/',
-            params: {
-                'csrf_token': '1575283943246',
-                'cookie2': '175203fa7876f0e9213abb3cfaa83e47',
-                campaignId: this.campaignId,
+        let allwords = {}
+        allwords['campaignId'] = this.campaignId
+        allwords['adGroupIdList'] = this.adGroupIdList
 
-                adGroupIdList: this.adGroupIdList
-            }
-        }).then(res => {
+        // 获取所有关键词 & 获取所有cpc关键词
+        getAllKeyword(allwords).then(res => {
             // 遍历数组，并获取keywod,recommendTags值
             for (let v of Object.values(res.data.data.recommendKeywordVOList)) {
                 this.key_all.push(v.keyword)
@@ -223,15 +216,9 @@ export default {
             }
             this.key_all = this.key_all.join(',')
             // 获取cpc 所有关键词
-            this.$axios({
-                method: 'post',
-                url: 'http://120.77.183.17:8888/post/offer/keyword/cpc/',
-                data: {
-                    csrf_token: '1575283943246',
-                    cookie2: '175203fa7876f0e9213abb3cfaa83e47',
-                    keywords: this.key_all
-                }
-            }).then(res => {
+            let cpckeywords = {}
+            cpckeywords['keywords'] = this.key_all
+            getCpckeyword(cpckeywords).then(res => {
                 for (let cpc_selected of Object.values(res.data.data.listVOREST)) {
                     this.key_cpc = cpc_selected
                     // 提取关键的键值放入key_cpc_all 数组
@@ -245,32 +232,24 @@ export default {
                     })
                 }
                 this.key_words()
-            }).catch(err => {
-                console.log(err.response)
+                this.upload_data()
+            }).catch(() => {
                 alert('获取cpc失败')
             })
-        }).catch(err => {
-            console.log(err.response)
+        }).catch(() => {
             alert('获取所有关键词失败')
         })
         // 获取类目信息
-        this.$axios({
-            method: 'get',
-            url: 'http://120.77.183.17:8888/get/campaign/adgroup/info/',
-            params: {
-                csrf_token: '1575283943246',
-                cookie2: '175203fa7876f0e9213abb3cfaa83e47',
-                'adGroupIds': this.adGroupIdList // 推广单元id
-            }
-        }).then(res => {
+        let info = {}
+        info['adGroupIds'] = this.adGroupIdList
+        getAdgropInfo(info).then(res => {
             this.category = res.data.data.adGroupVOList
             this.category = this.category.map(item => {
                 return [item.category, item.title]
             })
             // 进行分词
             this.get()
-        }).catch(err => {
-            console.log(err.response)
+        }).catch(() => {
             alert('整合类目&标题信息失败')
         })
     },
@@ -278,7 +257,6 @@ export default {
 
         // 进行分词
         get() {
-            console.log(this.category[0][1])
             let sources = this.category[0][1]
             this.$axios({
                 method: 'get',
@@ -289,7 +267,6 @@ export default {
                     param2: 1,
                     json: 1
                 }}).then(res => {
-                console.log(res)
                 // 将获取的分词通过p 参数的大小进行反向排序
                 res.data.sort(function(a, b) {
                     a.p = parseFloat(a.p)
@@ -297,8 +274,13 @@ export default {
                     return b.p - a.p
                 })
                 this.value = res.data
+                // 分词去重
+                this.part_titile = this.value.map(list => {
+                    return list.t
+                })
+                this.part_titile = [...new Set(this.part_titile)]
             })
-            this.key_words()
+            // this.key_words()
         },
         // 合并关键词
         key_words() {
@@ -329,21 +311,18 @@ export default {
         },
         // 上传关键词
         upload_data() {
-            this.$axios({
-                method: 'post',
-                url: 'http://120.77.183.17:8888/post/mysql/keyword/',
-                data: {
-                    keyword_list: this.keywords_gather
-                }
-            }).then(res => {
-                console.log(res)
+            let datas = {}
+            datas['keyword_list'] = this.keywords_gather
+            updata(datas).then(res => {
                 console.log('上传成功')
+            }).catch(() => {
+                console.log('上传失败')
             })
-            console.log(this.keywords_gather)
         },
         // 分割线----------------------------------------------------------------------
         // 分词按钮
         butanalyizer(value) {
+            this.btnshow = value
             this.listLoading = true
             let json = {}
             json['word'] = value
@@ -396,7 +375,6 @@ export default {
             let keydata = this.keyword
             let json = {}
             for (let i = 0; i < keydata.length; i++) {
-                console.log(keydata[i])
                 keywords.push(keydata[i].keyword)
                 bidPrices.push(parseFloat(keydata[i].pc).toFixed(1) + '_' + parseFloat(keydata[i].pv).toFixed(1))
             }
@@ -407,7 +385,23 @@ export default {
             json['keywords'] = keywords
             json['bidPrices'] = bidPrices
             offerkeyword(json).then(res => {
-                console.log(res)
+                const textErr = res.data.data.ErrorKeywordList
+                let errText = []
+                if (textErr.length != 0) {
+                    for (var i = 0; i < textErr.length; i++) {
+                        errText.push(textErr[i].keyword + '=>' + textErr[i].keywordAddErrorReason)
+                    }
+                    errText = errText.join('<br>')
+                    this.$message.error({
+                        dangerouslyUseHTMLString: true,
+                        message: `<strong>${errText}</strong>`
+                    })
+                } else {
+                    this.$message.success({
+                        message: '成功'
+                    })
+                }
+
                 // 跳转到推广计划下所有推广单元
                 this.$router.push({ path: '/getallplan/addgoods', query: { id: this.campaignId }})
             }).catch(err => {
@@ -429,6 +423,25 @@ export default {
     width: 11%;
   }
   .buttsuee{
-      margin-top: 20px
+      margin-top: 20px;
+      text-align: right;
+      background: #F4F4F8;
+     border: 1px solid hsla(0,0%,50%,.2);
+  }
+  // 点按钮样式
+  .btnshow{
+      background: #ecf5ff;
+  }
+  .btuncolor{
+      background: #ff6000
+  }
+  //提交关键字按钮
+  .btnpadd{
+      width: 130px;
+    height: 58px;
+    display: inline-block;
+    color: #fff;
+    text-align: center;
+    line-height: 58px;
   }
 </style>

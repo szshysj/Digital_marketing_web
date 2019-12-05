@@ -18,8 +18,9 @@ service.interceptors.request.use(function(config) {
     // config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     // console.log(config.headers['ddd'] = '666')
 
-    const token = store.getters.token
+    let token = getToken()
     if (token) {
+        token = (new Function('return (' + token + ')'))()
         if (config.method === 'post') {
             config.data = {
                 ...config.data,
@@ -50,7 +51,7 @@ service.interceptors.response.use(function(response) {
     // 对响应错误做点什么
     const status = error.response.status
     const errdata = error.response.data
-    if (status == 404) {
+    if (status == 401) {
         let errText = []
         for (let item in errdata) {
             errText.push(errdata[item])
@@ -66,6 +67,14 @@ service.interceptors.response.use(function(response) {
             })
         })
         return Promise.reject(error.response.data)
+    } else if (status == 404) {
+        let errText = []
+        for (let item in errdata) {
+            errText.push(errdata[item])
+        }
+        errText = errText.join('\n')
+        Message.error(errText)
+        return Promise.reject(error.response)
     } else if (status >= 500) {
         return Promise.reject('服务器错误！！！')
     }

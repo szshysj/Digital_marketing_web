@@ -88,6 +88,12 @@ export const constantRoutes = [
             name: 'Keywords',
             component: () => import('@/views/keywords/index'),
             meta: { title: '添加关键字', icon: 'addgoods' }
+        },
+        { hidden: true,
+            path: '/getallplan/addcell',
+            name: 'addcell',
+            component: () => import('@/views/addcell/index'),
+            meta: { title: '添加单元', icon: 'addgoods' }
         }
         ]
     },

@@ -16,7 +16,7 @@
         搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        添加
+        添加单元
       </el-button>
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
@@ -83,13 +83,13 @@
 
       <el-table-column label="类目" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.budget }}</span>
+          <span>{{ row.category }}</span>
         </template>
       </el-table-column>
 
       <el-table-column label="关键词数" width="110px" align="center">
         <template slot-scope="{row}">
-          <span style="color:red;">{{ row.priceMode }}</span>
+          <span style="color:red;">{{ row.keywordCount }}</span>
         </template>
       </el-table-column>
 
@@ -275,12 +275,18 @@ export default {
             this.getList()
         },
         // add
-        handleCreate() {
-            console.log('我是添加')
-            this.$message({
-                message: '我是添加',
-                type: 'success'
-            })
+        handleCreate(val) {
+            // console.log('我是添加')
+            // this.$message({
+            //     message: '我是添加',
+            //     type: 'success'
+            // })
+            let id = this.$route.query.id
+            let params = {}
+            params['campaignId'] = id
+            const title = val.title
+            // 将推广计划IP传入添加单元页面
+            this.$router.push({ path: '/getallplan/addcell', query: { id: params.campaignId, title: title }})
         },
         // 下载exle文件
         handleDownload() {
@@ -301,31 +307,31 @@ export default {
         // 修改标题
         handleUpdate(val) {
             console.log(val)
-            this.$confirm('我是修改计划', '修改', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                this.$message({
-                    type: 'success',
-                    message: '成功!'
-                })
-            }).catch(() => {
-                this.$message({
-                    type: 'info',
-                    message: '取消'
-                })
-            })
+            // this.$confirm('我是修改计划', '修改', {
+            //     confirmButtonText: '确定',
+            //     cancelButtonText: '取消',
+            //     type: 'warning'
+            // }).then(() => {
+            //     this.$message({
+            //         type: 'success',
+            //         message: '成功!'
+            //     })
+            // }).catch(() => {
+            //     this.$message({
+            //         type: 'info',
+            //         message: '取消'
+            //     })
+            // })
         },
         // 删除
         handleModifyStatus(val, status) {
             console.log(val, status)
-            this.$message({
-                message: `我是删除${status}`,
-                type: 'success'
-            })
+            // this.$message({
+            //     message: `我是删除${status}`,
+            //     type: 'success'
+            // })
         },
-        // 跳转推广单元商品
+        // 跳转推广单元关键词商品
         goodsPlan(val) {
             const title = val.title
             const campaignId = this.$route.query.id
