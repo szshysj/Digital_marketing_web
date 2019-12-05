@@ -145,6 +145,7 @@
 </template>
 
 <script>
+import { getparts, addCampaign } from '@/api/cell' // api
 import { campaignAdgroup, campaignAdgroupInfo } from '@/api/getallplan' // api
 export default {
     // components: { Pagination },
@@ -193,20 +194,12 @@ export default {
         // 获取所有的商品
         get_cell() {
             let id = this.$route.query.id
-            let params = {}
-            params['campaignId'] = id
             this.campaignId = id
+            let parts_value = {}
+            parts_value['skip'] = this.skip
+            parts_value['campaignId'] = this.campaignId
             console.log('获取推广单元1')
-            this.$axios({
-                method: 'get',
-                url: 'http://120.77.183.17:8888/get/offer/',
-                params: {
-                    'csrf_token': '1575283943246',
-                    'cookie2': '175203fa7876f0e9213abb3cfaa83e47',
-                    'campaignId': this.campaignId,
-                    'skip': this.skip // 页数
-                }
-            }).then((res) => {
+            getparts(parts_value).then((res) => {
                 console.log(res.data.data.promoteOfferList)
                 console.log('获取推广单元')
                 const dataok = res.data.data.promoteOfferList
@@ -222,18 +215,15 @@ export default {
         },
         // 将选中商品加入计划内
         cell_campaign() {
-            this.$axios({
-                method: 'post',
-                url: 'http://120.77.183.17:8888/post/adgroup/',
-                data: {
-                    'csrf_token': '1575283943246',
-                    'cookie2': '175203fa7876f0e9213abb3cfaa83e47',
-                    'campaignId': this.campaignId,
-                    'b2bOfferIds': this.selectedNumber
-                }
-            }).then(() => {
+            let add_cells = {}
+            add_cells['campaignId'] = this.campaignId
+            add_cells['b2bOfferIds'] = this.selectedNumber
+            console.log(add_cells)
+            addCampaign(add_cells).then(() => {
                 alert('添加成功')
                 this.get_cell()
+            }).catch((err) => {
+                console.log(err.response)
             })
         },
         // 分页1-每页多少条

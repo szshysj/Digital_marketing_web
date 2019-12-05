@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div v-loading="titleLoading" class="app-container">
     <div class="inline">
       <ul>
         <el-button
@@ -175,6 +175,7 @@ export default {
     data() {
         return {
             listLoading: false, // 加载动画
+            titleLoading: true,
             keyword: [], // 选择关键词
             tableData: [], // 分好词数据
             selsectAll: null, // 选中的row
@@ -279,6 +280,7 @@ export default {
                     return list.t
                 })
                 this.part_titile = [...new Set(this.part_titile)]
+                this.titleLoading = false
             })
             // this.key_words()
         },
