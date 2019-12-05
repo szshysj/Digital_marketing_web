@@ -82,7 +82,7 @@ export default {
     cursor: pointer;
 }
 .inputWidth{
-    width: 150px
+    width: 100px
 }
 .offSpan{
     cursor: pointer;

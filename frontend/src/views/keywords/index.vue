@@ -91,12 +91,12 @@
         <!-- 右边 -->
         <el-col :span="12">
           <div class="btnTop">
-            <el-row>
-              <el-col :span="12">
+            <el-row :gutter="24">
+              <el-col :span="18">
                 <p>已添加{{ this.keyword.length }}个关键词</p>
               </el-col>
-              <el-col :span="12">
-                <el-button type="warning" @click="handleModifyStatus()">批量删除</el-button>
+              <el-col :span="2" :offset="2">
+                <el-button type="warning" class="btuncolor" @click="handleModifyStatus()">批量删除</el-button>
               </el-col>
             </el-row>
           </div>
@@ -114,13 +114,13 @@
               width="120"
             />
 
-            <el-table-column align="center" label="PC端出价" width="280" prop="pc">
+            <el-table-column align="center" label="PC端出价" min-width="250" prop="pc">
               <template slot-scope="{row}">
                 <keywordShow :row="row" :offpc="pc" />
               </template>
             </el-table-column>
 
-            <el-table-column align="center" label="移动端出价" width="280" prop="pv">
+            <el-table-column align="center" label="移动端出价" min-width="250" prop="pv">
               <template slot-scope="{row}">
                 <keywordShow :row="row" :offpc="pv" />
               </template>
@@ -130,7 +130,7 @@
             <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width" type="index">
               <template slot-scope="{row,$index}">
                 <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,$index)">
-                  删除{{ $index }}
+                  删除
                 </el-button>
               </template>
             </el-table-column>
@@ -147,11 +147,9 @@
     </div>
     <!-- 提交 -->
     <div class="buttsuee">
-      <el-row :gutter="20">
-        <el-col :span="3" :offset="19">
-          <el-button type="primary" @click="clickKeyword">确定</el-button>
-        </el-col>
-      </el-row>
+
+      <span class="btuncolor btnpadd" @click="clickKeyword">保存并继续</span>
+
     </div>
   </div>
 </template>
@@ -421,10 +419,25 @@ export default {
     width: 11%;
   }
   .buttsuee{
-      margin-top: 20px
+      margin-top: 20px;
+      text-align: right;
+      background: #F4F4F8;
+     border: 1px solid hsla(0,0%,50%,.2);
   }
   // 点按钮样式
   .btnshow{
       background: #ecf5ff;
+  }
+  .btuncolor{
+      background: #ff6000
+  }
+  //提交关键字按钮
+  .btnpadd{
+      width: 130px;
+    height: 58px;
+    display: inline-block;
+    color: #fff;
+    text-align: center;
+    line-height: 58px;
   }
 </style>
