@@ -255,10 +255,10 @@ export default {
         // add
         handleCreate() {
             console.log('我是添加')
-            this.$message({
-                message: '我是添加',
-                type: 'success'
-            })
+            // this.$message({
+            //     message: '我是添加',
+            //     type: 'success'
+            // })
         },
         // 下载exle文件
         handleDownload() {
@@ -279,29 +279,29 @@ export default {
         // 修改标题
         handleUpdate(val) {
             console.log(val)
-            this.$confirm('我是修改计划', '修改', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                this.$message({
-                    type: 'success',
-                    message: '成功!'
-                })
-            }).catch(() => {
-                this.$message({
-                    type: 'info',
-                    message: '取消'
-                })
-            })
+            // this.$confirm('我是修改计划', '修改', {
+            //     confirmButtonText: '确定',
+            //     cancelButtonText: '取消',
+            //     type: 'warning'
+            // }).then(() => {
+            //     this.$message({
+            //         type: 'success',
+            //         message: '成功!'
+            //     })
+            // }).catch(() => {
+            //     this.$message({
+            //         type: 'info',
+            //         message: '取消'
+            //     })
+            // })
         },
         // 删除
         handleModifyStatus(val, status) {
             console.log(val, status)
-            this.$message({
-                message: `我是删除${status}`,
-                type: 'success'
-            })
+            // this.$message({
+            //     message: `我是删除${status}`,
+            //     type: 'success'
+            // })
         },
         // 跳转推广单元商品
         goodsPlan(val) {
