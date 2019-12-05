@@ -150,7 +150,7 @@ export default {
     // components: { Pagination },
     data() {
         return {
-            selectedNumber: [], // 选中时获取的数组
+            selectedNumber: '', // 选中时获取的数组
             currentPage4: 1, // 默认第几页
             totals: 100, // 总页数
             tableKey: 0, // 新增列表格
@@ -277,10 +277,7 @@ export default {
             this.selectedNumber = this.selectedNumber.map(list => {
                 return list.offerId
             })
-            console.log(this.selectedNumber)
-            console.log('选中的数组')
-            console.log(val)
-            // console.log(val[0].offerId)
+            this.selectedNumber = this.selectedNumber.join(',')
         }
     }
 }
