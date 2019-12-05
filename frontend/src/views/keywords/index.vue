@@ -18,14 +18,13 @@
       <el-row :gutter="20">
         <!-- 左边 -->
         <el-col :span="12">
-          <div class="btnTop" style="visibility: hidden;">
+
+          <div class="btnTop">
             <el-row>
               <el-col :span="12">
-                <p>已添加12个关键词</p>
+                <p>点击率为排序</p>
               </el-col>
-              <el-col :span="12">
-                <el-button type="warning">批量删除</el-button>
-              </el-col>
+
             </el-row>
           </div>
           <el-table
