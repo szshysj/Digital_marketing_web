@@ -4,6 +4,10 @@ from wtforms import IntegerField, StringField
 from wtforms.validators import DataRequired, Length, NumberRange, AnyOf
 
 
+class DeleteCampaignForm(BaseForm):
+    campaignIds = StringField('推广计划id列表', validators=[DataRequired(message='请输入推广计划id列表')])
+
+
 class GetCampaignInfoFrom(BaseForm):
     id = IntegerField('推广计划id', validators=[
         DataRequired(message='请输入推广计划id'),

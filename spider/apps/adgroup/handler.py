@@ -1,10 +1,31 @@
 from Digital_marketing.handler import BaseHandler
-from apps.adgroup.forms import AddAdgroupForm, GetCampaignAdgroupForm
+from apps.adgroup.forms import AddAdgroupForm, GetCampaignAdgroupForm, DeleteAdgroupForm
 from BaseRequest.AddAdgroup import AddAdgroup
 from BaseRequest.GetCampaignAdgroup import GetCampaignAdgroup
 from BaseRequest.GetCampaignAdgroupInfo import GetCampaignAdgroupInfo
+from BaseRequest.DeleteAdgroup import DeleteAdgroup
 
 from ujson import loads
+
+
+class DeleteAdgroupHandler(BaseHandler):
+
+    async def post(self):
+        param = loads(self.request.body.decode('utf8'))
+        form = DeleteAdgroupForm.from_json(param)
+
+        if not form.validate():
+            return await self.finish(self.error_handle(form))
+
+        resp = await DeleteAdgroup.post(self.application.session, form)
+
+        try:
+            data = loads(resp)
+        except ValueError:
+            self.set_status(401)
+            return await self.finish({'msg': '状态失效, 需要重新登录'})
+
+        await self.finish(data)
 
 
 class GetCampaignAdgroupInfoHandler(BaseHandler):
