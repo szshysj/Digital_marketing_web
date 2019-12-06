@@ -29,7 +29,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="list.slice((listQuery.page-1)*listQuery.limit,listQuery.page*listQuery.limit)"
+      :data="list"
       border
       fit
       highlight-current-row
@@ -238,32 +238,34 @@ export default {
             let id = this.$route.query.id
             let params = {}
             params['campaignId'] = id
-
-            console.log('我是数据')
+            // 获取所有推广单元的id
             campaignAdgroup(params).then(res => {
-                console.log(res)
                 const dataLength = res.data.data.totalCount
                 console.log(dataLength)
                 if (dataLength > 0) {
                     const dataId = res.data.data.adGroupVOList
+                    let jsonId = []
                     let dataArr = []
                     let dataStar = {}
                     for (let i = 0; i < dataId.length; i++) {
                         dataArr.push(dataId[i].id)
                     }
-                    dataStar['adGroupIds'] = dataArr.join(',')
-                    console.log(dataStar)
+                    for (let i = 0; i < dataArr.length; i += 10) {
+                        jsonId.push(dataArr.slice(i, i + 10))
+                    }
+                    // 整合数据，分页传多个id id == page
+                    dataStar['adGroupIds'] = jsonId[this.listQuery.page - 1].join(',')
+                    dataStar['limit'] = dataLength
+
+                    // 获取所有推广单元详细信息
                     campaignAdgroupInfo(dataStar).then(res => {
-                        console.log(res)
-                        const dataok = res.data.data.adGroupVOList
+                        const datares = res.data.data
+                        const dataok = datares.adGroupVOList
                         this.list = dataok
-                        this.total = dataok.length
-                        // console.log(data, data.length)
+                        this.total = dataLength
                     })
                 }
-                // this.list = data
-                // this.total = data.length
-                // console.log(data, data.length)
+
                 this.listLoading = false
             }).catch(err => {
                 console.log(err)

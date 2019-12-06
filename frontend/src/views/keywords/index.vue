@@ -34,6 +34,7 @@
             style="width: 100%"
             :default-sort="{prop: '_source.leftavgclick7days', order: 'descending'}"
             :header-cell-style="{background:'#F5F7FA'}"
+            height="600"
             @selection-change="clickRow"
           >
             <el-table-column
