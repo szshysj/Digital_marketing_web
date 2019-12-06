@@ -28,3 +28,7 @@ class AddCampaignForm(BaseForm):
     promoteTime = StringField('推广计划投放时间', validators=[
         DataRequired(message='请填写投放时间'),
         AnyOf(values=['1', '2', '3', '4', '5', '6', '7', '8', '9'])])
+
+
+class UpdateCampaignForm(GetCampaignInfoFrom, AddCampaignForm):
+    pass
