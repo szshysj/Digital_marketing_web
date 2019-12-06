@@ -27,3 +27,12 @@ export function campaignAdgroupInfo(params) {
         params
     })
 }
+
+// 删除推广计划
+export function deletecampaign(params) {
+    return request({
+        url: '/delete/campaign/',
+        method: 'get',
+        params
+    })
+}

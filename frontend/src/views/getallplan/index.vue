@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <!-- header -->
-    <div class="filter-container">
+    <div class="">
       <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
@@ -15,8 +15,11 @@
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
+      </el-button> -->
+      <el-button style="margin-left: 10px;" type="danger" :disabled="selectdisble" @click="handleModifyStatus()">
+        批量删除{{ selectdisble }}
       </el-button>
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
@@ -166,9 +169,9 @@
           <el-button type="success" size="mini" @click="goodsPlan(row)">
             查看
           </el-button>
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <!-- <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
-          </el-button>
+          </el-button> -->
           <!-- <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
             Publish
           </el-button>
@@ -190,13 +193,14 @@
 </template>
 
 <script>
-import { campaign } from '@/api/getallplan' // api
+import { campaign, deletecampaign } from '@/api/getallplan' // api
 import Pagination from '@/components/Pagination' // 分页组件
 export default {
     components: { Pagination },
     data() {
         return {
-
+            multipleSelection: [], // 选择的值
+            selectdisble: true,
             tableKey: 0, // 新增列表格
             options: {
                 '1': '推广中',
@@ -229,19 +233,20 @@ export default {
             list: [] // 总数据
         }
     },
+
     created() {
         this.getList()
     },
     methods: {
         // 获取数据
         getList() {
-            console.log('我是数据')
+            // console.log('我是数据')
             campaign().then(res => {
-                console.log(res)
+                // console.log(res)
                 const data = res.data.data.campaignVOList
                 this.list = data
                 this.total = data.length
-                console.log(data, data.length)
+                // console.log(data, data.length)
                 this.listLoading = false
             }).catch(err => {
                 console.log(err)
@@ -271,37 +276,59 @@ export default {
         getSortClass: function(key) {
             console.log(key, '我是排序功能样式')
         },
+
         // 选中的值
         handleSelectionChange(val) {
-            this.multipleSelection = val
             console.log(val)
+            this.selectdisble = !(val.length > 0)
+            // this.handleSelectionChange()
+            let Selection = []
+            for (let i = 0; i < val.length; i++) {
+                Selection.push(val[i].id)
+            }
+
+            this.multipleSelection = Selection
+            console.log(Selection)
         },
         // 修改标题
         handleUpdate(val) {
             console.log(val)
-            // this.$confirm('我是修改计划', '修改', {
-            //     confirmButtonText: '确定',
-            //     cancelButtonText: '取消',
-            //     type: 'warning'
-            // }).then(() => {
-            //     this.$message({
-            //         type: 'success',
-            //         message: '成功!'
-            //     })
-            // }).catch(() => {
-            //     this.$message({
-            //         type: 'info',
-            //         message: '取消'
-            //     })
-            // })
         },
         // 删除
         handleModifyStatus(val, status) {
             console.log(val, status)
-            // this.$message({
-            //     message: `我是删除${status}`,
-            //     type: 'success'
-            // })
+            let campaignIds = ''
+            const multipleSelection = this.multipleSelection
+
+            let textInfo = ''
+            if (status == 'deleted') {
+                textInfo = '你确定要删除该计划吗？'
+                campaignIds = val.id
+            } else {
+                textInfo = '您确认要删除所选的推广计划吗？'
+
+                campaignIds = multipleSelection.join(',')
+            }
+            this.$confirm(textInfo, {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                deletecampaign({ campaignIds }).then(res => {
+                    this.$message({
+                        type: 'success',
+                        message: '删除成功!'
+                    })
+                    this.getList()
+                }).catch((err) => {
+                    console.log(err)
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                })
+            })
         },
         // 跳转推广单元商品
         goodsPlan(val) {
