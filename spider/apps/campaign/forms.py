@@ -4,6 +4,12 @@ from wtforms import IntegerField, StringField
 from wtforms.validators import DataRequired, Length, NumberRange, AnyOf
 
 
+class GetCampaignInfoFrom(BaseForm):
+    id = IntegerField('推广计划id', validators=[
+        DataRequired(message='请输入推广计划id'),
+        NumberRange(min=100000000, max=999999999, message='请输入推广计划id正确的范围')])
+
+
 class AddCampaignForm(BaseForm):
     title = StringField('推广计划标题', validators=[
         DataRequired(message='请输入标题'),
