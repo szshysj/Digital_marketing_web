@@ -1,13 +1,5 @@
 <template>
   <div class="app-container">
-    <!-- header -->
-    <div class="filter-container">
-      <!-- <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-upload2" @click="cell_campaign">
-        加入计划
-      </el-button>
-    </div>
-    <!-- content -->
     <el-table
       ref="multipleTable"
       :key="tableKey"
@@ -22,6 +14,7 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column
+        ref="multipleTable"
         align="center"
         type="selection"
         width="55"
@@ -52,12 +45,6 @@
               :value="item"
             />
           </el-select>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="是否已经加入计划" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.isInCampaign === 1 ? '已加入':'否' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="商品状态" width="110px" align="center">
@@ -129,17 +116,24 @@
     </el-table>
 
     <!-- 分页 -->
-    <div class="block">
-      <span class="demonstration"><br></span>
-      <el-pagination
-        background
-        :current-page="currentPage4"
-        layout="total, prev, pager, next"
-        :total="totals"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      >
-      </el-pagination>
+    <div>
+      <!-- <span class="demonstration"><br></span> -->
+      <div style="margin-left: 20px;float: left; margin-top: 18px; margin-bottom: 20px;">
+        <el-pagination
+          background
+          :current-page="currentPage4"
+          layout="total, prev, pager, next"
+          :total="totals"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        >
+        </el-pagination>
+      </div>
+      <div style="float: right; margin-right: 100px; margin-top: 10px; margin-bottom: 20px;">
+        <el-button class="filter-item" type="primary" icon="el-icon-upload2" @click="cell_campaign">
+          加入计划
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -151,6 +145,7 @@ export default {
     // components: { Pagination },
     data() {
         return {
+            select_value: {}, // 获取已选中值存放的id
             selectedNumber: '', // 选中时获取的数组
             currentPage4: 1, // 默认第几页
             totals: 100, // 总页数
@@ -208,6 +203,19 @@ export default {
                 this.list = dataok
                 // this.total = dataok.length
                 this.listLoading = false
+                // 渲染后将加入计划的商品勾选上
+                let $this = this
+                this.$nextTick(() => {
+                    $this.list.forEach(row => {
+                        // this.$refs.multipleTable.toggleRowSelection(row)
+                        console.log('row.isInCampaign', row.isInCampaign)
+                        // let $this = this
+                        if (row.isInCampaign) {
+                            console.log('rowsss', row)
+                            $this.$refs.multipleTable.toggleRowSelection(row)
+                        }
+                    })
+                })
             }).catch(err => {
                 console.log(err.response)
                 alert('获取cpc失败')
@@ -220,8 +228,10 @@ export default {
             add_cells['b2bOfferIds'] = this.selectedNumber
             console.log(add_cells)
             addCampaign(add_cells).then(() => {
-                alert('添加成功')
-                this.get_cell()
+                this.messages()
+                // this.get_cell()
+                // 跳转到上级页面
+                this.$router.push({ path: '/getallplan/addgoods', query: { id: this.campaignId }})
             }).catch((err) => {
                 console.log(err.response)
             })
@@ -243,6 +253,14 @@ export default {
             } else {
                 return true
             }
+        },
+        // 弹窗
+        messages() {
+            this.$message({
+                message: '这是一条成功的提示消息',
+                type: 'success',
+                duration: 1500
+            })
         },
         // 搜索事件
         // handleFilter() {
