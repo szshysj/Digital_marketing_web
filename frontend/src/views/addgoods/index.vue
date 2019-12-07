@@ -21,12 +21,9 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加单元
       </el-button>
-      <el-button class="filter-item" :disabled="banif" style="margin-left: 10px;" type="danger" icon="el-icon-delete" @click="open_delete_ids">
+      <el-button class="filter-item" :disabled="banif" style="margin-left: 10px;" type="danger" icon="el-icon-delete" @click="delete_id_all">
         删除单元
       </el-button>
-      <!-- <template>
-        <el-button type="text" @click="open">点击打开 Message Box</el-button>
-      </template> -->
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
       </el-button>
@@ -179,7 +176,7 @@
           <!-- <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
           </el-button> -->
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="open_del_id(row)">
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="delete_id_all(row,'deleted')">
             删除
           </el-button>
         </template>
@@ -336,32 +333,44 @@ export default {
             //     })
             // })
         },
-        // 多选删除
-        delete_ids() {
-            // this.deleteId = this.multipleSelection
-            // let i = this.multipleSelection[0]
-            if (this.multipleSelection[0]) {
-                let dl_ids = this.multipleSelection.map(item => {
+        // 删除优化
+        delete_id_all(val, status) {
+            let adGroupIds = ''
+            let textInfo = ''
+            const multipleSelection = this.multipleSelection
+            if (status === 'deleted') {
+                textInfo = '确认删除该商品吗？'
+                adGroupIds = val.id
+            } else {
+                textInfo = '确认删除所选商品吗？'
+                adGroupIds = multipleSelection.map(item => {
                     return item.id
                 })
-                this.deleteId['adGroupIds'] = dl_ids
-                console.log(this.deleteId)
-                // this.deleteId = this.deleteId.join(',')
-                deleteAdgroupsInfo(this.deleteId).then(() => {
-                    console.log('删除成功')
-                })
-                this.getList()
-            } else {
-                console.log('值为空')
+                adGroupIds = adGroupIds.join(',')
+                console.log(adGroupIds)
             }
-        },
-        // 单个按钮删除
-        del_id(val) {
-            let dl_id = {}
-            dl_id['adGroupIds'] = val.id
-            deleteAdgroupsInfo(dl_id).then(() => {
-                console.log('删除成功')
-                this.getList()
+            this.$confirm(textInfo, {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                deleteAdgroupsInfo({ adGroupIds }).then(() => {
+                    console.log('删除成功')
+                    this.getList()
+                }).catch((err) => {
+                    console.log(err)
+                })
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!',
+                    duration: 1500
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除',
+                    duration: 1500
+                })
             })
         },
         // 跳转推广单元关键词商品
@@ -370,58 +379,12 @@ export default {
             const campaignId = this.$route.query.id
             const adGroupIdList = val.id
             // console.log(goodsId, '我是推广单元商品跳转')
-
             this.$router.push({ path: '/getallplan/keywords', query: { title, campaignId, adGroupIdList }})
-        },
-        // 弹窗&多选删除
-        open_delete_ids() {
-            // let $this =this
-            this.$confirm('此操作将删除所选商品, 是否继续?', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                this.delete_ids()
-                this.$message({
-                    type: 'success',
-                    message: '删除成功!',
-                    duration: 1500
-                })
-            }).catch(() => {
-                this.$message({
-                    type: 'info',
-                    message: '已取消删除',
-                    duration: 1500
-                })
-            })
-        },
-        // 弹窗&单按钮删除
-        open_del_id(rows) {
-            // let $this =this
-            let row = rows // 接收参数
-            this.$confirm('此操作将删除所选商品, 是否继续?', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                console.log('sanchu')
-                this.del_id(row)
-                this.$message({
-                    type: 'success',
-                    message: '删除成功!',
-                    duration: 1500
-                })
-            }).catch(() => {
-                this.$message({
-                    type: 'info',
-                    message: '已取消删除',
-                    duration: 1500
-                })
-            })
         }
     }
 }
 </script>
 
 <style lang="scss" scoped>
+
 </style>
