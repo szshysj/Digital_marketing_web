@@ -21,7 +21,7 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加单元
       </el-button>
-      <el-button class="filter-item" :disabled="banif" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="open_delete_ids">
+      <el-button class="filter-item" :disabled="banif" style="margin-left: 10px;" type="danger" icon="el-icon-delete" @click="open_delete_ids">
         删除单元
       </el-button>
       <!-- <template>
@@ -315,7 +315,7 @@ export default {
             }
             this.multipleSelection = val
             console.log(val)
-            // console.log(this.list)
+            console.log(this.list)
         },
         // 修改标题
         handleUpdate(val) {
@@ -407,6 +407,12 @@ export default {
                 center: true
             }).then(() => {
                 console.log('sanchu')
+                this.del_id(row)
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!',
+                    duration: 1500
+                })
             }).catch(() => {
                 this.$message({
                     type: 'info',
