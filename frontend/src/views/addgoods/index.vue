@@ -426,4 +426,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.aa{
+    font-family: 500
+}
 </style>
