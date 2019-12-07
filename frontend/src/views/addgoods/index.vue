@@ -315,7 +315,7 @@ export default {
             }
             this.multipleSelection = val
             console.log(val)
-            console.log(this.list)
+            // console.log(this.list)
         },
         // 修改标题
         handleUpdate(val) {
@@ -407,12 +407,6 @@ export default {
                 center: true
             }).then(() => {
                 console.log('sanchu')
-                this.del_id(row)
-                this.$message({
-                    type: 'success',
-                    message: '删除成功!',
-                    duration: 1500
-                })
             }).catch(() => {
                 this.$message({
                     type: 'info',

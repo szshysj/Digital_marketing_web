@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <!-- header -->
-    <div class="">
+    <div>
       <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
@@ -18,8 +18,8 @@
       <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button> -->
-      <el-button style="margin-left: 10px;" type="danger" :disabled="selectdisble" @click="handleModifyStatus()">
-        批量删除{{ selectdisble }}
+      <el-button class="filter-item" :disabled="selectdisble" style="margin-left: 10px;" type="danger" @click="handleModifyStatus()">
+        批量删除
       </el-button>
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
@@ -32,12 +32,12 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="list.slice((listQuery.page-1)*listQuery.limit,listQuery.page*listQuery.limit)"
+      :data="list"
       border
       fit
       highlight-current-row
       style="width: 100%;"
-      :default-sort="{prop: 'id', order: 'ascending'}"
+      :default-sort="{prop: 'row.budget', order: 'ascending'}"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
     >
@@ -199,8 +199,8 @@ export default {
     components: { Pagination },
     data() {
         return {
-            multipleSelection: [], // 选择的值
             selectdisble: true,
+            multipleSelection: {}, // 选择的值
             tableKey: 0, // 新增列表格
             options: {
                 '1': '推广中',
@@ -244,7 +244,7 @@ export default {
             campaign().then(res => {
                 // console.log(res)
                 const data = res.data.data.campaignVOList
-                this.list = data
+                this.list = data.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.page * this.listQuery.limit)
                 this.total = data.length
                 // console.log(data, data.length)
                 this.listLoading = false
@@ -279,16 +279,14 @@ export default {
 
         // 选中的值
         handleSelectionChange(val) {
-            console.log(val)
             this.selectdisble = !(val.length > 0)
-            // this.handleSelectionChange()
+            const val1 = val
             let Selection = []
-            for (let i = 0; i < val.length; i++) {
-                Selection.push(val[i].id)
+            for (let i = 0; i < val1.length; i++) {
+                Selection.push(val1[i].id)
             }
 
             this.multipleSelection = Selection
-            console.log(Selection)
         },
         // 修改标题
         handleUpdate(val) {
@@ -296,7 +294,6 @@ export default {
         },
         // 删除
         handleModifyStatus(val, status) {
-            console.log(val, status)
             let campaignIds = ''
             const multipleSelection = this.multipleSelection
 
@@ -330,6 +327,7 @@ export default {
                 })
             })
         },
+
         // 跳转推广单元商品
         goodsPlan(val) {
             const goodsId = val.id
