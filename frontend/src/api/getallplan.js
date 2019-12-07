@@ -36,3 +36,12 @@ export function deletecampaign(params) {
         params
     })
 }
+// 删除推广单元
+
+export function deleteAdgroupsInfo(data) {
+    return request({
+        url: '/delete/adgroup/',
+        method: 'POST',
+        data
+    })
+}

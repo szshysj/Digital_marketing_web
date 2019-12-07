@@ -1,7 +1,10 @@
 <template>
   <div class="app-container">
-    <!-- header -->
-    <div class="filter-container">
+    <!-- <el-button class="filter-item" :disabled="banif" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="open_delete_ids">
+      删除单元
+    </el-button> -->
+    <!-- header class="filter-container"-->
+    <div>
       <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
@@ -18,6 +21,12 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加单元
       </el-button>
+      <el-button class="filter-item" :disabled="banif" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="open_delete_ids">
+        删除单元
+      </el-button>
+      <!-- <template>
+        <el-button type="text" @click="open">点击打开 Message Box</el-button>
+      </template> -->
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         下载
       </el-button>
@@ -33,7 +42,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%; margin-top: 20px;"
       :default-sort="{prop: 'id', order: 'ascending'}"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
@@ -162,21 +171,15 @@
       </el-table-column> -->
 
       <!-- 按钮功能 -->
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="Actions" align="center" width="180" class-name="small-padding fixed-width" fixed="right">
         <template slot-scope="{row}">
           <el-button type="success" size="mini" @click="goodsPlan(row)">
             关键字
           </el-button>
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <!-- <el-button type="primary" size="mini" @click="handleUpdate(row)">
             修改
-          </el-button>
-          <!-- <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
-            Publish
-          </el-button>
-          <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
-            Draft
           </el-button> -->
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="open_del_id(row)">
             删除
           </el-button>
         </template>
@@ -190,13 +193,15 @@
 </template>
 
 <script>
-import { campaignAdgroup, campaignAdgroupInfo } from '@/api/getallplan' // api
+import { campaignAdgroup, campaignAdgroupInfo, deleteAdgroupsInfo } from '@/api/getallplan' // api
 import Pagination from '@/components/Pagination' // 分页组件
 export default {
     components: { Pagination },
     data() {
         return {
-
+            banif: true,
+            multipleSelection: {}, // 存放选中的值
+            deleteId: {}, // 存放需要删除的id
             tableKey: 0, // 新增列表格
             options: {
                 '1': '推广中',
@@ -303,8 +308,14 @@ export default {
         },
         // 选中的值
         handleSelectionChange(val) {
+            if (val.length > 0) {
+                this.banif = false
+            } else {
+                this.banif = true
+            }
             this.multipleSelection = val
             console.log(val)
+            console.log(this.list)
         },
         // 修改标题
         handleUpdate(val) {
@@ -325,13 +336,33 @@ export default {
             //     })
             // })
         },
-        // 删除
-        handleModifyStatus(val, status) {
-            console.log(val, status)
-            // this.$message({
-            //     message: `我是删除${status}`,
-            //     type: 'success'
-            // })
+        // 多选删除
+        delete_ids() {
+            // this.deleteId = this.multipleSelection
+            // let i = this.multipleSelection[0]
+            if (this.multipleSelection[0]) {
+                let dl_ids = this.multipleSelection.map(item => {
+                    return item.id
+                })
+                this.deleteId['adGroupIds'] = dl_ids
+                console.log(this.deleteId)
+                // this.deleteId = this.deleteId.join(',')
+                deleteAdgroupsInfo(this.deleteId).then(() => {
+                    console.log('删除成功')
+                })
+                this.getList()
+            } else {
+                console.log('值为空')
+            }
+        },
+        // 单个按钮删除
+        del_id(val) {
+            let dl_id = {}
+            dl_id['adGroupIds'] = val.id
+            deleteAdgroupsInfo(dl_id).then(() => {
+                console.log('删除成功')
+                this.getList()
+            })
         },
         // 跳转推广单元关键词商品
         goodsPlan(val) {
@@ -341,6 +372,54 @@ export default {
             // console.log(goodsId, '我是推广单元商品跳转')
 
             this.$router.push({ path: '/getallplan/keywords', query: { title, campaignId, adGroupIdList }})
+        },
+        // 弹窗&多选删除
+        open_delete_ids() {
+            // let $this =this
+            this.$confirm('此操作将删除所选商品, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+                center: true
+            }).then(() => {
+                this.delete_ids()
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!',
+                    duration: 1500
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除',
+                    duration: 1500
+                })
+            })
+        },
+        // 弹窗&单按钮删除
+        open_del_id(rows) {
+            // let $this =this
+            let row = rows // 接收参数
+            this.$confirm('此操作将删除所选商品, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+                center: true
+            }).then(() => {
+                console.log('sanchu')
+                this.del_id(row)
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!',
+                    duration: 1500
+                })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除',
+                    duration: 1500
+                })
+            })
         }
     }
 }
