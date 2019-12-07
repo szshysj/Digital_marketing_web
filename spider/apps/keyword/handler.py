@@ -45,8 +45,13 @@ class AddKeywordToMysqlHandler(BaseHandler):
             try:
                 sql_data = await self.application.objects.get(
                     Offer_Keyword.select(Offer_Keyword.keyword,
-                                         Offer_Keyword.keyword_update_time
-                                         ).where(Offer_Keyword.keyword == data[0]))
+                                         Offer_Keyword.keyword_update_time,
+                                         Offer_Keyword.category
+                                         ).where(
+                        (Offer_Keyword.keyword == data[0]) & (Offer_Keyword.category == data[-2])
+                    )
+                )
+
                 # 将结果dict化
                 sql_data = model_to_dict(sql_data)
 
@@ -63,8 +68,12 @@ class AddKeywordToMysqlHandler(BaseHandler):
                             leftAvgClick7days=round(data[3], 2),
                             leftAvgPV7days=round(data[4], 2),
                             searchAvg7days=data[5],
+                            category=data[-2],
                             keyword_update_time=data[-1]
-                        ).where(Offer_Keyword.keyword == data[0]))
+                        ).where(
+                            (Offer_Keyword.keyword == data[0]) & (Offer_Keyword.category == data[-2])
+                        )
+                    )
 
             # 找不到数据, 做insert操作
             except Offer_Keyword.DoesNotExist:
@@ -77,6 +86,7 @@ class AddKeywordToMysqlHandler(BaseHandler):
                                                           leftAvgClick7days=round(data[3], 2),
                                                           leftAvgPV7days=round(data[4], 2),
                                                           searchAvg7days=data[5],
+                                                          category=data[-2],
                                                           keyword_update_time=data[-1])
 
             # 无论怎样, 都将数据保存到 '历史' 库
@@ -88,6 +98,7 @@ class AddKeywordToMysqlHandler(BaseHandler):
                                                       leftAvgClick7days=round(data[3], 2),
                                                       leftAvgPV7days=round(data[4], 2),
                                                       searchAvg7days=data[5],
+                                                      category=data[-2],
                                                       update_time=data[-1])
 
         await self.finish('finish')

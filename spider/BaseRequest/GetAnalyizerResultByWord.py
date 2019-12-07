@@ -7,10 +7,33 @@ class GetAnalyizerResultByWord(BaseApi):
     async def get(session, form):
         params = {
             "query": {
-                "match": {
-                    "keyword": form.word.data
+                "bool": {
+                    "must": [
+                        {
+                            "match": {
+                                "keyword": form.word.data
+                            }
+                        },
+                        {
+                            "match": {
+                                "category": form.category.data
+                            }
+                        }
+                    ],
+                    "must_not": {
+                        "term": {
+                            "is_delete": 'true'
+                        }
+                    }
                 }
-            }
+            },
+            "sort": [
+                {
+                    "leftavgclick7days": {
+                        "order": "desc"
+                    }
+                }
+            ]
         }
 
         headers = {'Content-Type': 'application/json'}

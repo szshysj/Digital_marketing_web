@@ -4,7 +4,9 @@ from peewee import FixedCharField, DateTimeField, CharField, SmallIntegerField, 
 
 
 class Offer_Keyword_7days(BaseModel):
+    id = PrimaryKeyField(verbose_name='主键id')
     keyword = CharField(max_length=10, null=False, verbose_name='关键词')
+    category = CharField(max_length=10, null=False, verbose_name='关键词类目')
     recommendTags = CharField(max_length=30, null=False, verbose_name='推荐理由')
     countBuyer = SmallIntegerField(null=False, verbose_name='竞争指数')
     leftAvgClick7days = FloatField(null=False, verbose_name='点击率')
@@ -16,7 +18,8 @@ class Offer_Keyword_7days(BaseModel):
 
 class Offer_Keyword(BaseModel):
     id = PrimaryKeyField(verbose_name='主键id')
-    keyword = CharField(max_length=10, null=False, unique=True, verbose_name='关键词')
+    keyword = CharField(max_length=10, null=False, verbose_name='关键词')
+    category = CharField(max_length=10, null=False, verbose_name='关键词类目')
     recommendTags = CharField(max_length=30, null=False, verbose_name='推荐理由')
     countBuyer = SmallIntegerField(null=False, verbose_name='竞争指数')
     leftAvgClick7days = FloatField(null=False, verbose_name='点击率')
