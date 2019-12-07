@@ -1,7 +1,17 @@
 from Digital_marketing.forms import BaseForm
 
 from wtforms import IntegerField, StringField
-from wtforms.validators import DataRequired, Length, NumberRange, AnyOf
+from wtforms.validators import DataRequired, Length, NumberRange, AnyOf, Regexp
+
+
+class CampaignReportForm(BaseForm):
+    start = StringField('起始日期', validators=[
+        DataRequired(message='请输入起始日期'),
+        Regexp(regex='.*(\\d{4}-\\d{2}-\\d{2}).*', message='请输入正确的日期格式')])
+
+    end = StringField('起始日期', validators=[
+        DataRequired(message='请输入起始日期'),
+        Regexp(regex='.*(\\d{4}-\\d{2}-\\d{2}).*', message='请输入正确的日期格式')])
 
 
 class DeleteCampaignForm(BaseForm):

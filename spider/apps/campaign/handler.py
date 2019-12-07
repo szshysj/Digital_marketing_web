@@ -1,13 +1,35 @@
 from Digital_marketing.handler import BaseHandler
 from Digital_marketing.forms import BaseForm
-from apps.campaign.forms import AddCampaignForm, GetCampaignInfoFrom, UpdateCampaignForm, DeleteCampaignForm
+from apps.campaign.forms import AddCampaignForm, GetCampaignInfoFrom, UpdateCampaignForm, DeleteCampaignForm, \
+    CampaignReportForm
 from BaseRequest.AddCampaign import AddCampaign
 from BaseRequest.GetAllCampaign import GetAllCampaign
 from BaseRequest.GetACampaignInfo import GetACampaignInfo
 from BaseRequest.UpdateCampaign import UpdateCampaign
 from BaseRequest.DeleteCampaign import DeleteCampaign
+from BaseRequest.CampaignReport import CampaignReport
 
 from ujson import loads
+
+
+class CampaignReportHandler(BaseHandler):
+
+    async def post(self):
+        param = loads(self.request.body.decode('utf8'))
+        form = CampaignReportForm.from_json(param)
+
+        if not form.validate():
+            return await self.finish(self.error_handle(form))
+
+        text = await CampaignReport.post(self.application.session, form)
+
+        try:
+            data = loads(text)
+        except ValueError:
+            self.set_status(401)
+            return await self.finish({'msg': '状态失效, 需要重新登录'})
+
+        await self.finish(data)
 
 
 class DeleteCampaignHandler(BaseHandler):
