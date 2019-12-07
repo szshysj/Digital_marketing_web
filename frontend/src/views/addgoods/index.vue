@@ -4,7 +4,7 @@
       删除单元
     </el-button> -->
     <!-- header class="filter-container"-->
-    <div class="filter-container">
+    <div>
       <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
@@ -42,6 +42,7 @@
       border
       fit
       highlight-current-row
+      style="width: 100%; margin-top: 20px;"
       :default-sort="{prop: 'id', order: 'ascending'}"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
@@ -379,7 +380,6 @@ export default {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
-
             }).then(() => {
                 this.delete_ids()
                 this.$message({
@@ -403,7 +403,6 @@ export default {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
-
             }).then(() => {
                 console.log('sanchu')
                 this.del_id(row)
@@ -425,10 +424,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .aa{
-    background: #001528;
-  }
-.aa{
-    font-family: 500
-}
 </style>
