@@ -4,7 +4,7 @@
       删除单元
     </el-button> -->
     <!-- header class="filter-container"-->
-    <div>
+    <div class="filter-container">
       <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
         <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
@@ -42,7 +42,6 @@
       border
       fit
       highlight-current-row
-      style="width: 100%; margin-top: 20px;"
       :default-sort="{prop: 'id', order: 'ascending'}"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
@@ -376,11 +375,11 @@ export default {
         // 弹窗&多选删除
         open_delete_ids() {
             // let $this =this
-            this.$confirm('此操作将删除所选商品, 是否继续?', '提示', {
+            this.$confirm('此操作将删除所选商品, 是否继续?', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
-                type: 'warning',
-                center: true
+                type: 'warning'
+
             }).then(() => {
                 this.delete_ids()
                 this.$message({
@@ -400,11 +399,11 @@ export default {
         open_del_id(rows) {
             // let $this =this
             let row = rows // 接收参数
-            this.$confirm('此操作将删除所选商品, 是否继续?', '提示', {
+            this.$confirm('此操作将删除所选商品, 是否继续?', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
-                type: 'warning',
-                center: true
+                type: 'warning'
+
             }).then(() => {
                 console.log('sanchu')
                 this.del_id(row)
