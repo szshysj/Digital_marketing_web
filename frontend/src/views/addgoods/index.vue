@@ -1,4 +1,5 @@
 <template>
+  <!--  <router-view  v-if="isRouterAlive"/> -->
   <div class="app-container">
     <!-- <el-button class="filter-item" :disabled="banif" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="open_delete_ids">
       删除单元
@@ -196,7 +197,8 @@ export default {
     components: { Pagination },
     data() {
         return {
-            banif: true,
+            isRouterAlive: true, // 控制页面刷新
+            banif: true, // 按钮禁用状态
             multipleSelection: {}, // 存放选中的值
             deleteId: {}, // 存放需要删除的id
             tableKey: 0, // 新增列表格
@@ -265,9 +267,13 @@ export default {
                         const dataok = datares.adGroupVOList
                         this.list = dataok
                         this.total = dataLength
+                    }).catch((err) => {
+                        console.log(err)
                     })
+                } else {
+                    // 值为空时，使list内存为空
+                    this.list = []
                 }
-
                 this.listLoading = false
             }).catch(err => {
                 console.log(err)
@@ -354,8 +360,9 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                deleteAdgroupsInfo({ adGroupIds }).then(() => {
+                deleteAdgroupsInfo({ adGroupIds }).then((res) => {
                     console.log('删除成功')
+                    console.log(res)
                     this.getList()
                 }).catch((err) => {
                     console.log(err)

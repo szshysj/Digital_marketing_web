@@ -211,7 +211,7 @@ export default {
                         console.log('row.isInCampaign', row.isInCampaign)
                         // let $this = this
                         if (row.isInCampaign) {
-                            console.log('rowsss', row)
+                            // console.log('rowsss', row)
                             $this.$refs.multipleTable.toggleRowSelection(row)
                         }
                     })
@@ -227,14 +227,21 @@ export default {
             add_cells['campaignId'] = this.campaignId
             add_cells['b2bOfferIds'] = this.selectedNumber
             console.log(add_cells)
-            addCampaign(add_cells).then(() => {
-                this.messages()
-                // this.get_cell()
-                // 跳转到上级页面
-                this.$router.push({ path: '/getallplan/addgoods', query: { id: this.campaignId }})
-            }).catch((err) => {
-                console.log(err.response)
-            })
+            if (this.selectedNumber) {
+                addCampaign(add_cells).then(() => {
+                    this.$message({ message: '添加商品成功', type: 'success' })
+                    // 跳转到上级页面
+                    this.$router.push({ path: '/getallplan/addgoods', query: { id: this.campaignId }})
+                }).catch(() => {
+                    console.log('上传失败')
+                })
+            } else {
+                this.$message({
+                    message: '请勾选商品',
+                    type: 'error',
+                    duration: 1500
+                })
+            }
         },
         // 分页1-每页多少条
         handleSizeChange(val) {
@@ -280,12 +287,25 @@ export default {
         },
         // 选中的值
         handleSelectionChange(val) {
-            this.multipleSelection = val
+            // this.multipleSelection = val
             this.selectedNumber = val
+            console.log('选中的商品')
+            console.log(val)
             this.selectedNumber = this.selectedNumber.map(list => {
-                return list.offerId
+                // return list.offerId
+                if (list.isInCampaign === 0) {
+                    return list.offerId
+                } else {
+                    return null
+                }
             })
+            console.log(this.selectedNumber)
+            let set_value = new Set(this.selectedNumber)
+            set_value.delete(null)
+            this.selectedNumber = [...new Set(set_value)]
+            console.log(set_value)
             this.selectedNumber = this.selectedNumber.join(',')
+            // console.log(this.selectedNumber)
         }
     }
 }
