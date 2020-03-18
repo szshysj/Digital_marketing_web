@@ -13,6 +13,16 @@ from requests import get, post
 
 """======================================增================================================"""
 
+"""
+CREATE TABLE es_table (
+  id BIGINT(20) UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY unique_id (id),
+  client_name VARCHAR(32) NOT NULL,
+  modification_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  insertion_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+"""
 
 def init():
     database.create_tables([Offer_Keyword, Offer_Keyword_7days])
